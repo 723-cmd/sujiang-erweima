@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>玄武速降 · 车辆智能降温装置</title>
+<style>
+:root {
+  --bg: #f7f5f0;
+  --bg-card: #ffffff;
+  --bg-soft: #fcfbf8;
+  --ink: #1a1a2e;
+  --ink-2: #4a4a6a;
+  --ink-3: #9a9ab0;
+  --c-blue: #264653;
+  --c-teal: #2a9d8f;
+  --c-red: #e63946;
+  --c-orange: #f4845f;
+  --c-gold: #e9c46a;
+  --c-green: #52b788;
+  --line: rgba(0,0,0,0.07);
+  --shadow-s: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-m: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-l: 0 12px 40px rgba(0,0,0,0.08);
+  --r: 12px;
+  --r-lg: 18px;
+  --font-d: 'Noto Serif SC', serif;
+  --font-b: 'Noto Sans SC', sans-serif;
+  --max-w: 960px;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+
+body{
+  font-family:var(--font-b);
+  background:
+    radial-gradient(ellipse at 25% 10%, rgba(42,157,143,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 90%, rgba(38,70,83,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 40%, #faf8f3 0%, var(--bg) 60%, #ece5d8 100%);
+  color:var(--ink);
+  line-height:1.7;
+  overflow-x:hidden;
+  position:relative;
+  min-height:100vh;
+}
+/* 侧边装饰竖条 */
+.side-strip{
+  position:fixed;top:0;bottom:0;
+  width:8px;
+  z-index:999;
+  pointer-events:none;
+  opacity:0.75;
+}
+.side-left{
+  left:0;
+  background:linear-gradient(180deg,
+    transparent 0%, var(--c-teal) 5%, var(--c-blue) 40%,
+    var(--c-blue) 60%, var(--c-teal) 95%, transparent 100%);
+  box-shadow:2px 0 16px rgba(42,157,143,0.2);
+}
+.side-right{
+  right:0;
+  background:linear-gradient(180deg,
+    transparent 0%, var(--c-blue) 5%, var(--c-teal) 40%,
+    var(--c-teal) 60%, var(--c-blue) 95%, transparent 100%);
+  box-shadow:-2px 0 16px rgba(42,157,143,0.2);
+}
+
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+
+/* HERO */
+.hero{
+  position:relative;
+  padding:56px 0 40px;
+  text-align:center;
+}
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  height:280px;
+  background:linear-gradient(155deg,var(--c-blue) 0%,var(--c-teal) 100%);
+  clip-path:polygon(0 0,100% 0,100% 70%,0 100%);
+}
+.hero-content{position:relative;z-index:2}
+.hero-name{
+  font-family:var(--font-d);
+  font-size:46px;
+  font-weight:900;
+  color:#fff;
+  letter-spacing:3px;
+  margin-bottom:8px;
+  text-shadow:0 2px 24px rgba(0,0,0,0.15);
+}
+.hero-desc{
+  font-size:15px;
+  color:rgba(255,255,255,0.8);
+  max-width:560px;
+  margin:0 auto 18px;
+  line-height:1.8;
+}
+.hero-school{
+  display:inline-block;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.9);
+  padding:6px 18px;
+  border-radius:50px;
+  font-size:12px;
+  font-weight:500;
+}
+
+/* MAIN CARD */
+.main-card{
+  background:var(--bg-card);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-l);
+  padding:32px;
+  margin-top:-28px;
+  margin-bottom:32px;
+  position:relative;
+  z-index:3;
+}
+
+/* TABS */
+.tab-nav{
+  display:flex;
+  gap:4px;
+  background:var(--bg-soft);
+  border-radius:var(--r);
+  padding:5px;
+  margin-bottom:28px;
+}
+.tab-btn{
+  flex:1;
+  padding:13px 8px;
+  border:none;
+  background:none;
+  font-family:var(--font-b);
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink-3);
+  border-radius:8px;
+  cursor:pointer;
+  transition:all 0.3s;
+}
+.tab-btn:hover{color:var(--ink-2)}
+.tab-btn.active{
+  background:var(--bg-card);
+  color:var(--c-blue);
+  box-shadow:var(--shadow-s);
+}
+.tab-btn.active::after{
+  content:'';
+  position:absolute;
+  bottom:2px;left:50%;
+  transform:translateX(-50%);
+  width:28px;height:3px;
+  background:var(--c-teal);
+  border-radius:2px;
+}
+
+.tab-content{display:none;animation:fadeUp 0.45s ease}
+.tab-content.active{display:block}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* SECTION TITLES */
+.section-title{
+  font-family:var(--font-d);
+  font-size:20px;
+  font-weight:700;
+  color:var(--c-blue);
+  margin-bottom:6px;
+  padding-bottom:10px;
+  border-bottom:2px solid var(--c-teal);
+  display:inline-block;
+  margin-bottom:18px;
+}
+.section-subtitle{
+  font-size:12px;
+  color:var(--ink-3);
+  margin-bottom:16px;
+  margin-top:-12px;
+}
+
+/* INTRO LAYOUT */
+.intro-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-bottom:28px;
+}
+.intro-text h3{
+  font-family:var(--font-d);
+  font-size:18px;
+  font-weight:700;
+  color:var(--c-blue);
+  margin-bottom:10px;
+}
+.intro-text p{
+  font-size:14px;
+  color:var(--ink-2);
+  line-height:1.9;
+}
+.intro-img{
+  background:var(--bg-soft);
+  border-radius:var(--r);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.intro-img img{
+  width:100%;
+  height:auto;
+  border-radius:var(--r);
+}
+
+/* PAIN POINTS */
+.pain-section{margin-bottom:28px}
+.pain-cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+.pain-card{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:18px;
+  cursor:pointer;
+  transition:all 0.35s;
+}
+.pain-card:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-m);
+  border-color:var(--c-teal);
+}
+.pain-card .icon{font-size:22px;margin-bottom:8px}
+.pain-card h4{font-size:14px;font-weight:600;margin-bottom:6px}
+.pain-card p{font-size:12px;color:var(--ink-2);line-height:1.65}
+.pain-card .detail{display:none;margin-top:10px;padding:12px;background:rgba(42,157,143,0.06);border-radius:8px;font-size:12px;color:var(--ink-2);line-height:1.7}
+.pain-card.expanded .detail{display:block}
+.pain-card.expanded{border-color:var(--c-teal);background:#f0faf7}
+
+.pain-img-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-top:14px;
+}
+.pain-img-box{
+  background:var(--bg-soft);
+  border-radius:var(--r);
+  overflow:hidden;
+  text-align:center;
+}
+.pain-img-box img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.pain-img-box .caption{
+  font-size:11px;
+  color:var(--ink-3);
+  padding:8px;
+}
+
+/* INNOVATIONS */
+.inno-section{margin-bottom:28px}
+.inno-cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+.inno-card{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:16px;
+  cursor:pointer;
+  transition:all 0.35s;
+  border-top:3px solid var(--c-teal);
+}
+.inno-card:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-m);
+}
+.inno-card .num{
+  display:inline-block;
+  width:24px;height:24px;
+  border-radius:50%;
+  background:var(--c-teal);
+  color:#fff;
+  text-align:center;
+  line-height:24px;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.inno-card h4{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--c-blue)}
+.inno-card p{font-size:11px;color:var(--ink-2);line-height:1.6}
+.inno-card .detail{display:none;margin-top:8px;font-size:11px;color:var(--ink-2);line-height:1.7}
+.inno-card.expanded{background:#f0faf7;border-color:var(--c-teal)}
+.inno-card.expanded .detail{display:block}
+
+.inno-img-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-top:14px;
+}
+.inno-img-box{
+  background:var(--bg-soft);
+  border-radius:var(--r);
+  overflow:hidden;
+  text-align:center;
+}
+.inno-img-box img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.inno-img-box .caption{
+  font-size:10px;
+  color:var(--ink-3);
+  padding:6px;
+}
+
+/* DESIGN OVERVIEW */
+.design-section{margin-bottom:28px}
+.design-img{
+  background:var(--bg-soft);
+  border-radius:var(--r);
+  overflow:hidden;
+  margin-top:12px;
+}
+.design-img img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.design-img .caption{
+  font-size:11px;
+  color:var(--ink-3);
+  padding:10px;
+  text-align:center;
+}
+
+/* METRICS */
+.metrics-strip{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1px;
+  background:var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.metric-cell{
+  background:var(--bg-soft);
+  padding:20px 10px;
+  text-align:center;
+  cursor:pointer;
+  transition:background 0.3s;
+}
+.metric-cell:hover{background:#e8f4f0}
+.metric-cell .num{
+  font-family:var(--font-d);
+  font-size:26px;
+  font-weight:900;
+  line-height:1;
+  margin-bottom:5px;
+}
+.metric-cell .lbl{
+  font-size:10px;
+  color:var(--ink-3);
+  font-weight:500;
+}
+
+/* ========== AI TAB ========== */
+.ai-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-bottom:24px;
+}
+
+/* Gauge */
+.gauge-area{text-align:center}
+.gauge-wrap{
+  position:relative;
+  width:200px;height:200px;
+  margin:0 auto 16px;
+}
+.gauge-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.g-track{fill:none;stroke:#e8e8ef;stroke-width:12}
+.g-fill{fill:none;stroke-width:12;stroke-linecap:round;transition:all 0.6s ease}
+.g-center{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.g-val{
+  font-family:var(--font-d);
+  font-size:44px;font-weight:900;
+  line-height:1;transition:color 0.4s;
+}
+.g-unit{font-size:14px;color:var(--ink-3)}
+.g-tag{font-size:11px;color:var(--ink-3);margin-top:3px;transition:color 0.4s}
+
+/* Slider */
+.slider-box{margin:0 10px}
+.slider-labels{
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--ink-3);margin-bottom:6px;
+}
+input[type=range]{
+  -webkit-appearance:none;
+  width:100%;height:6px;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--c-green),#7ec896,var(--c-gold),#e8b44a,var(--c-orange),#e87050,var(--c-red),#c42030);
+  outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:22px;height:22px;
+  border-radius:50%;
+  background:#fff;
+  border:3px solid var(--c-blue);
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  cursor:pointer;
+  transition:transform 0.2s;
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.slider-tip{
+  text-align:center;font-size:11px;
+  color:var(--ink-3);margin-top:8px;
+}
+
+/* Quick buttons */
+.quick-btns{
+  display:flex;flex-wrap:wrap;gap:6px;
+  justify-content:center;margin-top:14px;
+}
+.qb{
+  padding:6px 12px;
+  border:1px solid var(--line);
+  background:var(--bg-soft);
+  border-radius:20px;
+  font-size:11px;font-weight:500;
+  color:var(--ink-2);cursor:pointer;
+  transition:all 0.3s;
+}
+.qb:hover{border-color:var(--c-teal);color:var(--c-teal)}
+.qb.active{background:var(--c-blue);color:#fff;border-color:var(--c-blue)}
+
+/* Analysis output */
+.ai-output{display:flex;flex-direction:column;gap:14px}
+.status-box{
+  padding:16px;
+  border-radius:var(--r);
+  display:flex;align-items:flex-start;gap:12px;
+  transition:all 0.4s;
+}
+.s-icon{
+  width:40px;height:40px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.s-txt h4{font-size:14px;font-weight:600;margin-bottom:3px}
+.s-txt p{font-size:12px;line-height:1.6}
+
+.s-safe .s-icon{background:#dcfce7}
+.s-safe{background:#f0fdf4;border:1px solid #bbf7d0}
+.s-safe h4{color:#166534}.s-safe p{color:#15803d}
+
+.s-warn .s-icon{background:#fef9c3}
+.s-warn{background:#fefce8;border:1px solid #fde68a}
+.s-warn h4{color:#854d0e}.s-warn p{color:#a16207}
+
+.s-hot .s-icon{background:#ffedd5}
+.s-hot{background:#fff7ed;border:1px solid #fed7aa}
+.s-hot h4{color:#9a3412}.s-hot p{color:#c2410c}
+
+.s-danger .s-icon{background:#fee2e2}
+.s-danger{background:#fef2f2;border:1px solid #fecaca}
+.s-danger h4{color:#991b1b}.s-danger p{color:#dc2626}
+
+.act-panel{
+  background:var(--bg-soft);
+  border-radius:var(--r);padding:16px;
+}
+.act-panel h4{
+  font-size:13px;font-weight:600;
+  color:var(--c-blue);margin-bottom:10px;
+}
+.act-item{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--ink-2);
+  padding:7px 0;border-bottom:1px solid var(--line);
+}
+.act-item:last-child{border-bottom:none}
+.act-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  transition:background 0.3s;
+}
+.dot-on{background:var(--c-green);box-shadow:0 0 6px rgba(82,183,136,0.5)}
+.dot-off{background:var(--ink-3)}
+
+.adv-panel{
+  border-radius:var(--r);padding:16px;
+  transition:all 0.4s;
+}
+.adv-panel h4{
+  font-size:13px;font-weight:600;
+  margin-bottom:8px;
+}
+.adv-panel p{font-size:13px;line-height:1.75;color:var(--ink-2)}
+
+/* Detail cards */
+.detail-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:20px;
+}
+.d-card{
+  background:var(--bg-card);
+  border-radius:var(--r);
+  box-shadow:var(--shadow-s);
+  padding:20px;border:1px solid var(--line);
+}
+.d-card h4{font-size:13px;font-weight:600;margin-bottom:14px}
+
+/* Lifespan */
+.life-flex{display:flex;align-items:center;gap:18px}
+.life-ring{position:relative;width:80px;height:80px;flex-shrink:0}
+.life-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.lr-bg{fill:none;stroke:#e8e8ef;stroke-width:7}
+.lr-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:all 0.6s}
+.life-center{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.life-pct{
+  font-family:var(--font-d);
+  font-size:20px;font-weight:900;transition:color 0.4s;
+}
+.life-lbl{font-size:8px;color:var(--ink-3)}
+.life-stats{flex:1}
+.life-row{
+  display:flex;justify-content:space-between;
+  padding:5px 0;border-bottom:1px solid var(--line);
+  font-size:12px;
+}
+.life-row:last-child{border-bottom:none}
+.life-row .l{color:var(--ink-3)}
+.life-row .v{font-weight:600}
+
+/* Heatmap */
+.heat-box{
+  position:relative;height:110px;
+  background:#1a1a2e;border-radius:8px;overflow:hidden;
+}
+.heat-grid{
+  position:absolute;inset:6px;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(3,1fr);
+  gap:2px;
+}
+.heat-cell{
+  border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;color:rgba(255,255,255,0.7);
+  font-weight:500;transition:background 0.3s;
+}
+.heat-bar{
+  position:absolute;bottom:4px;left:6px;right:6px;
+  display:flex;justify-content:space-between;
+  font-size:9px;color:rgba(255,255,255,0.5);
+}
+.heat-info{
+  display:flex;justify-content:space-between;
+  margin-top:8px;font-size:11px;
+}
+.heat-info .l{color:var(--ink-3)}
+.heat-info .v{font-weight:600}
+
+/* Future section */
+.future-section{margin-top:24px}
+.future-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:12px;
+}
+.future-card{
+  background:var(--bg-soft);
+  border:1px dashed var(--line);
+  border-radius:var(--r);
+  padding:16px;
+  text-align:center;
+  transition:all 0.3s;
+}
+.future-card:hover{border-color:var(--c-teal);background:#f0faf7}
+.future-card .icon{font-size:24px;margin-bottom:8px}
+.future-card h4{font-size:13px;font-weight:600;margin-bottom:4px}
+.future-card p{font-size:11px;color:var(--ink-2);line-height:1.6}
+
+/* ========== DATA TAB ========== */
+.data-card{
+  background:var(--bg-card);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-m);
+  padding:28px;margin-bottom:20px;
+}
+.data-head{
+  display:flex;justify-content:space-between;
+  align-items:flex-end;margin-bottom:18px;
+  flex-wrap:wrap;gap:10px;
+}
+.data-head h3{
+  font-family:var(--font-d);
+  font-size:17px;font-weight:700;
+}
+.data-head p{font-size:11px;color:var(--ink-3)}
+.legend{display:flex;gap:16px;flex-wrap:wrap}
+.leg-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;color:var(--ink-2);
+}
+.leg-line{width:16px;height:3px;border-radius:2px}
+.chart-box{
+  height:320px;min-height:320px;position:relative;
+  background:var(--bg-soft);
+  border-radius:8px;border:1px solid var(--line);
+  padding:8px;
+}
+.chart-box canvas{width:100%!important;height:100%!important}
+.chart-subtitle{
+  font-size:11px;color:var(--ink-3);
+  text-align:center;margin-top:8px;
+}
+
+/* Water */
+.water-row{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:20px;align-items:center;
+  margin-top:24px;
+}
+.wc-card{
+  text-align:center;padding:22px;
+  border-radius:var(--r);border:1px solid var(--line);
+}
+.wc-card.old{background:#fef2f2}
+.wc-card.new{background:#f0fdf4;border-color:#bbf7d0}
+.wc-card h4{font-size:11px;color:var(--ink-3);font-weight:500;margin-bottom:6px}
+.wc-big{
+  font-family:var(--font-d);
+  font-size:36px;font-weight:900;line-height:1;
+}
+.wc-big.red{color:var(--c-red)}.wc-big.green{color:var(--c-green)}
+.wc-unit{font-size:13px;font-weight:400}
+.wc-note{font-size:10px;color:var(--ink-3);margin-top:5px}
+.wc-vs{text-align:center}
+.wc-badge{
+  display:inline-flex;flex-direction:column;align-items:center;gap:3px;
+  background:linear-gradient(135deg,var(--c-teal),var(--c-blue));
+  color:#fff;padding:12px 18px;border-radius:var(--r);
+}
+.wc-badge .n{font-family:var(--font-d);font-size:24px;font-weight:900}
+.wc-badge .l{font-size:10px;opacity:0.85}
+
+/* Wind table */
+.wind-table{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;
+  gap:1px;
+  background:var(--line);
+  border-radius:8px;overflow:hidden;
+}
+.wind-table .wh{
+  background:var(--c-blue);
+  color:#fff;
+  padding:10px 8px;
+  text-align:center;
+  font-size:11px;font-weight:600;
+}
+.wind-table .wd{
+  background:var(--bg-soft);
+  padding:12px 8px;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+  transition:all 0.3s;
+}
+.wind-table .wd:hover{background:#e8f4f0;transform:scale(1.03)}
+.wind-table .wd.hl{color:var(--c-teal);font-weight:600}
+
+/* Test photos */
+.photos-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:16px;
+}
+.photo-box{
+  background:var(--bg-soft);
+  border-radius:var(--r);
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform 0.3s;
+}
+.photo-box:hover{transform:scale(1.03)}
+.photo-box img{
+  width:100%;height:180px;
+  object-fit:cover;
+  display:block;
+}
+.photo-box .caption{
+  font-size:11px;color:var(--ink-3);
+  padding:8px;text-align:center;
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:28px 0 36px;
+  border-top:1px solid var(--line);
+}
+.footer p{font-size:12px;color:var(--ink-3)}
+
+/* RESPONSIVE */
+/* ===== 平板/小屏 ≤768px ===== */
+@media(max-width:768px){
+  .side-strip{display:none}
+  .hero{padding:40px 0 28px}
+  .hero::before{height:220px}
+  .hero-name{font-size:28px;letter-spacing:2px}
+  .hero-desc{font-size:13px;max-width:100%;padding:0 12px}
+  .hero-school{font-size:11px;padding:4px 14px}
+  .main-card{padding:18px;margin-top:-20px}
+  .wrap{padding:0 12px}
+  /* 标签按钮 */
+  .tab-btn{font-size:12px;padding:11px 4px}
+  /* 布局 */
+  .intro-grid{grid-template-columns:1fr;gap:16px}
+  .pain-cards,.inno-cards{grid-template-columns:1fr;gap:10px}
+  .inno-img-row,.pain-img-row{grid-template-columns:repeat(2,1fr);gap:8px}
+  .ai-grid,.detail-row{grid-template-columns:1fr;gap:16px}
+  .water-row{grid-template-columns:1fr}.wc-vs{order:-1}
+  .metrics-strip{grid-template-columns:repeat(3,1fr)}
+  .future-grid,.photos-grid{grid-template-columns:1fr}
+  .thermal-compare{grid-template-columns:1fr;gap:10px}
+  .formula-strip{grid-template-columns:1fr}
+  .dm-images{grid-template-columns:1fr;gap:10px}
+  .dm-images .dm-img-box img{height:auto}
+  /* 风速表滚动 */
+  .wind-table{min-width:600px}
+  .wind-table .wh,.wind-table .wd{padding:8px 6px;min-width:60px}
+  /* canvas */
+  .chart-box{min-height:260px}
+  .gauge-wrap{width:160px;height:160px}
+  .g-val{font-size:36px}
+  /* 卡片 */
+  .data-card{padding:16px}
+  .data-head{flex-direction:column;align-items:flex-start;gap:8px}
+  .design-module{padding:14px}
+  .pain-img-card .pic{height:110px}
+  .slider-box{margin:0}
+  /* 按钮 */
+  .simu-btn-play,.simu-btn-stop{padding:10px 20px;font-size:13px}
+}
+
+/* ===== 手机 ≤480px ===== */
+@media(max-width:480px){
+  .hero{padding:32px 0 22px}
+  .hero::before{height:190px}
+  .hero-name{font-size:24px;letter-spacing:1px}
+  .hero-desc{font-size:12px}
+  .main-card{padding:14px 12px;border-radius:14px}
+  .tab-btn{font-size:11px;padding:10px 2px}
+  .tab-btn.active::after{width:20px}
+  .metrics-strip{grid-template-columns:repeat(2,1fr)}
+  .inno-img-row,.pain-img-row{grid-template-columns:1fr}
+  .metric-cell{padding:14px 6px}
+  .metric-cell .num{font-size:22px}
+  .metric-cell .lbl{font-size:9px}
+  /* 图例 */
+  .legend{flex-wrap:wrap;gap:6px}
+  .leg-item{font-size:10px}
+  /* 风速表 */
+  .wind-table .wh,.wind-table .wd{font-size:10px;padding:6px 5px;min-width:50px}
+  .chart-box{min-height:220px}
+  .gauge-wrap{width:130px;height:130px}
+  .g-val{font-size:30px}
+  /* 按钮 */
+  .simu-btn-play,.simu-btn-stop{width:100%;text-align:center}
+  /* 图片卡片 */
+  .pain-img-card .pic{height:90px}
+  .dm-images .dm-img-box img{height:auto}
+  /* 设计模块 */
+  .design-module{padding:12px}
+  .dm-header{gap:8px}
+  .dm-num{width:22px;height:22px;font-size:11px}
+  /* 标题 */
+  .section-title{font-size:17px}
+  /* 图例单独行 */
+  .data-head .legend{margin-top:4px}
+}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
+.reveal.show{opacity:1;transform:translateY(0)}
+
+/* ===== PAIN POINT IMAGES ===== */
+.pain-img-card{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+  cursor:pointer;
+  transition:all 0.35s;
+}
+.pain-img-card:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-m);
+  border-color:var(--c-teal);
+}
+.pain-img-card .pic{
+  width:100%;height:140px;object-fit:cover;display:block;
+}
+.pain-img-card .body{padding:16px}
+.pain-img-card h4{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--c-blue)}
+.pain-img-card p{font-size:12px;color:var(--ink-2);line-height:1.65}
+.pain-img-card .detail{display:none;margin-top:10px;padding:12px;background:rgba(42,157,143,0.06);border-radius:8px;font-size:12px;color:var(--ink-2);line-height:1.7}
+.pain-img-card.expanded .detail{display:block}
+.pain-img-card.expanded{border-color:var(--c-teal);background:#f0faf7}
+
+/* ===== DESIGN MODULE LAYOUT ===== */
+.design-module{
+  background:var(--bg-card);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:20px;
+  margin-bottom:16px;
+  transition:all 0.3s;
+}
+.design-module:hover{box-shadow:var(--shadow-m);border-color:var(--c-teal)}
+.dm-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+}
+.dm-num{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--c-teal),var(--c-blue));
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
+.dm-header h4{font-size:15px;font-weight:600;color:var(--c-blue)}
+.dm-images{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+.dm-images .dm-img-box{
+  background:var(--bg-soft);border-radius:var(--r);
+  overflow:hidden;border:1px solid var(--line);
+  display:flex;flex-direction:column;
+}
+.dm-images .dm-img-box img{
+  width:100%;height:360px;object-fit:contain;object-position:center;display:block;
+  image-rendering:auto;
+}
+.dm-images .dm-img-box .dm-cap{
+  font-size:11px;color:var(--ink-3);padding:8px 10px;text-align:center;
+  border-top:1px solid var(--line);background:var(--bg-card);
+}
+
+/* ===== FORMULA STRIP ===== */
+.formula-strip{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+  margin-top:20px;
+}
+.formula-cell{
+  background:var(--bg-card);
+  padding:22px 16px;
+  text-align:center;
+}
+.formula-cell .f-title{
+  font-size:11px;color:var(--ink-3);font-weight:500;margin-bottom:8px;
+}
+.formula-cell .f-eq{
+  font-family:'Georgia','Times New Roman',serif;
+  font-size:15px;color:var(--c-blue);font-weight:600;
+  line-height:1.8;
+}
+.formula-cell .f-eq sub{font-size:10px;vertical-align:sub}
+.formula-cell .f-eq sup{font-size:10px;vertical-align:super}
+.formula-cell .f-note{
+  font-size:10px;color:var(--ink-3);margin-top:6px;
+}
+
+/* ===== INTRO TEXT INDENT ===== */
+.intro-text p{text-indent:2em}
+
+/* ===== THERMAL COMPARE ===== */
+.thermal-compare{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+.thermal-box{
+  border-radius:var(--r);overflow:hidden;
+  border:1px solid var(--line);background:var(--bg-soft);
+}
+.thermal-box img{width:100%;height:200px;object-fit:cover;display:block}
+.thermal-box .t-label{
+  font-size:12px;font-weight:600;padding:10px;text-align:center;
+}
+.thermal-box.hot .t-label{color:var(--c-red);background:#fef2f2}
+.thermal-box.cool .t-label{color:var(--c-green);background:#f0fdf4}
+
+/* ===== NEW: INNOVATION BLOCKS ===== */
+.inno-list{display:flex;flex-direction:column;gap:16px}
+.inno-block{
+  background:var(--bg-card);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:28px 32px;
+  transition:all 0.35s;
+  position:relative;
+  border-left:4px solid var(--c-teal);
+}
+.inno-block:hover{
+  box-shadow:var(--shadow-m);
+  border-color:var(--c-teal);
+}
+.inno-block .inno-num{
+  display:inline-flex;width:36px;height:36px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--c-teal),var(--c-blue));
+  color:#fff;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;
+  margin-bottom:12px;
+  box-shadow:0 4px 12px rgba(42,157,143,0.25);
+}
+.inno-block h3{font-family:var(--font-d);font-size:17px;font-weight:700;color:var(--c-blue);margin-bottom:10px}
+.inno-block .inno-desc{font-size:13px;color:var(--ink-2);line-height:1.85;margin-bottom:12px;text-indent:2em}
+.inno-block .inno-detail{
+  font-size:12px;color:var(--ink-3);line-height:1.8;
+  padding:14px 16px;background:var(--bg-soft);border-radius:var(--r);
+  border-left:3px solid var(--c-teal);
+}
+
+/* ===== NEW: DATA REDESIGN ===== */
+.data-section{margin-bottom:24px}
+.data-section-title{
+  font-family:var(--font-d);font-size:17px;font-weight:700;
+  color:var(--c-blue);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.data-section-title .ds-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--c-teal);
+}
+.simu-box{
+  background:var(--bg-soft);
+  border-radius:var(--r);border:1px solid var(--line);
+  padding:20px;margin-bottom:16px;
+}
+.simu-canvas-wrap{
+  width:100%;height:220px;
+  background:linear-gradient(180deg,#0d1b2a 0%,#1b2838 100%);
+  border-radius:10px;overflow:hidden;
+  position:relative;margin-bottom:12px;
+}
+.simu-canvas-wrap canvas{width:100%;height:100%;display:block}
+.simu-label{
+  position:absolute;bottom:8px;left:10px;
+  font-size:10px;color:rgba(255,255,255,0.5);
+  background:rgba(0,0,0,0.4);padding:3px 8px;border-radius:4px;
+}
+.simu-ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.simu-ctrl button{
+  padding:7px 16px;border:none;border-radius:20px;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;
+}
+.simu-btn-play{background:var(--c-teal);color:#fff}
+.simu-btn-play:hover{background:#248a7e}
+.simu-btn-stop{background:var(--bg-soft);color:var(--ink-2);border:1px solid var(--line)}
+.simu-btn-stop:hover{border-color:var(--c-teal)}
+
+.principle-img{
+  background:var(--bg-card);
+  border-radius:var(--r);border:1px solid var(--line);
+  overflow:hidden;text-align:center;
+}
+.principle-img img{
+  width:100%;height:auto;max-height:400px;object-fit:contain;object-position:center;
+  display:block;padding:0;
+}
+</style>
+</head>
+<body>
+<div class="side-strip side-left"></div>
+<div class="side-strip side-right"></div>
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-name">玄武速降</h1>
+    <p class="hero-desc">基于文丘里效应与水膜水雾蒸发的车辆智能降温装置</p>
+    <span class="hero-school">安徽信息工程学院</span>
+  </div>
+</section>
+
+<div class="wrap">
+
+<!-- ====== MAIN CARD ====== -->
+<section class="main-card reveal">
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="intro">项目介绍</button>
+    <button class="tab-btn" data-tab="ai">AI 智能分析</button>
+    <button class="tab-btn" data-tab="data">性能数据</button>
+  </div>
+
+  <!-- ==================== TAB 1: 产品介绍 ==================== -->
+  <div class="tab-content active" id="tab-intro">
+
+    <!-- 项目简介 -->
+    <div class="section-title">项目简介</div>
+    <div class="intro-grid">
+      <div class="intro-text">
+        <p>车辆长时间制动时，刹车盘摩擦产生极端高温，制动效能断崖式下降甚至完全失灵，严重威胁驾驶员生命安全。</p>
+        <p style="margin-top:8px">全国重型货车近900万辆，传统淋水散热已被法规禁止且导致刹车盘开裂；乘用车保有量超2.5亿辆，自然风冷低速散热严重不足；新能源汽车保有量已达4397万辆且快速增长，电池增重使制动负荷更大，叠加国家战略扶持使智能安全零部件成为刚需。</p>
+        <p style="margin-top:8px">该项目提出三大创新点：一是<strong>双文丘里管并联自适应风道</strong>，上管被动进风、下管内嵌风机，60km/h时喉部风速达<strong style="color:var(--c-teal)">151m/s</strong>（入口9倍），对流换热效率提升<strong style="color:var(--c-teal)">3.2倍</strong>，高速零能耗、低速仅3W；二是<strong>涡流协同雾化蒸发散热</strong>，将水破碎为5~10μm细雾经旋转涡流吹送至刹车盘表面瞬间蒸发吸热，降温速率<strong style="color:var(--c-teal)">4.7°C/s</strong>，单次仅耗水1.5mL，节水<strong style="color:var(--c-teal)">95%以上</strong>且无开裂风险；三是<strong>AI边缘计算热点预判与寿命预测</strong>，提前<strong style="color:var(--c-teal)">0.08s</strong>预测热点轨迹，二自由度云台精准追踪，实时评估制动盘剩余寿命并自动告警。</p>
+        <p style="margin-top:8px">刹车盘峰值温降超<strong style="color:var(--c-red)">200℃</strong>，高速零能耗运行，适用货车、乘用车与新能源汽车，实现节能、节水、节材、减排协同效益，助力交通运输绿色低碳转型。</p>
+      </div>
+      <div class="intro-img">
+        <img src="images/intro_infographic.jpg" alt="玄武速降设计思路" style="width:100%;border-radius:var(--r);border:1px solid var(--line)" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <!-- 行业痛点 -->
+    <div class="pain-section">
+      <div class="section-title">行业痛点</div>
+      <div class="pain-cards" id="painCards">
+        <div class="pain-img-card" onclick="togglePain(this)">
+          <img class="pic" src="images/pain_truck.jpg" alt="货车制动热衰退">
+          <div class="body">
+            <h4>货车：淋水降温被法规禁止</h4>
+            <p>全国重型货车近900万辆，长下坡连续制动使制动盘温度极易超过300°C。GB7258强制装配盘式制动器且严禁淋水，山区35%~60%重特大事故涉及制动热衰退。</p>
+            <div class="detail">传统淋水器单次耗水30~150L，且温差剧变导致刹车盘热冲击开裂。GB7258-2017明确要求危险货物运输车、三轴及以上货车强制安装盘式制动器，淋水降温方案彻底退出历史舞台。</div>
+          </div>
+        </div>
+        <div class="pain-img-card" onclick="togglePain(this)">
+          <img class="pic" src="images/pain_brake.jpg" alt="刹车盘过热">
+          <div class="body">
+            <h4>乘用车：自然风冷严重不足</h4>
+            <p>全国乘用车保有量超2.5亿辆。低速工况风压不足，散热能力极弱；强制风冷方案耗电50~100W、低速效果差。制动热衰退风险持续存在。</p>
+            <div class="detail">乘用车在山区长下坡、城市拥堵频繁制动等场景下，制动盘温度可攀升至400°C以上。现有强制风冷方案依赖大功率风扇，低速时风压不足导致散热效果极差。</div>
+          </div>
+        </div>
+        <div class="pain-img-card" onclick="togglePain(this)">
+          <img class="pic" src="images/pain_ev.jpg" alt="新能源电池增重">
+          <div class="body">
+            <h4>新能源：电池增重加剧负荷</h4>
+            <p>新能源汽车保有量4397万辆且快速增长。电池增重300~500kg使制动负荷显著上升，智能热管理是行业核心技术方向。</p>
+            <div class="detail">新能源汽车因电池包增重，制动系统负荷比同级别燃油车高15%~25%。国家"十四五"规划明确将智能热管理列为新能源汽车关键技术。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 设计方案 -->
+    <div class="design-section">
+      <div class="section-title">设计方案</div>
+      <p style="font-size:14px;color:var(--ink-2);line-height:1.9;margin-bottom:16px;text-indent:2em">本装置采用感知层、决策层、执行层的架构设计，由并联智能风道模块、文丘里涡流增压风道模块、环形风道控制系统模块及高压精细雾化蒸发系统模块构成，实现制动盘温度智能分级控制。</p>
+      
+      <div class="design-module">
+        <div class="dm-header"><div class="dm-num">1</div><h4>并联式智能风道模块</h4></div>
+        <div class="dm-images">
+          <div class="dm-img-box">
+            <img src="images/module1_flow.jpg" alt="并联风道流程图" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">温度控制逻辑流程图</div>
+          </div>
+          <div class="dm-img-box">
+            <img src="images/module1_model.jpg" alt="并联风道模型" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">并联风道三维模型</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-module">
+        <div class="dm-header"><div class="dm-num">2</div><h4>文丘里涡流增压管道模块</h4></div>
+        <div class="dm-images">
+          <div class="dm-img-box">
+            <img src="images/module2_flow.jpg" alt="文丘里涡流流程图" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">文丘里增压流程图</div>
+          </div>
+          <div class="dm-img-box">
+            <img src="images/module2_model.jpg" alt="文丘里涡流模型" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">涡流增压三维模型</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-module">
+        <div class="dm-header"><div class="dm-num">3</div><h4>环形风道控制系统模块</h4></div>
+        <div class="dm-images">
+          <div class="dm-img-box">
+            <img src="images/module3_flow.jpg" alt="环形风道控制流程图" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">环形风道控制流程图</div>
+          </div>
+          <div class="dm-img-box">
+            <img src="images/module3_model.jpg" alt="环形风道控制模型" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">齿轮传动系统模型</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-module">
+        <div class="dm-header"><div class="dm-num">4</div><h4>高压精细雾化蒸发系统模块</h4></div>
+        <div class="dm-images">
+          <div class="dm-img-box">
+            <img src="images/module4_flow.jpg" alt="雾化蒸发流程图" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">雾化蒸发系统流程图</div>
+          </div>
+          <div class="dm-img-box">
+            <img src="images/module4_model.jpg" alt="雾化蒸发模型" onerror="this.parentElement.style.display='none'">
+            <div class="dm-cap">泵阀喷嘴三维模型</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-img" style="margin-top:16px">
+        <img src="images/p18_100.jpeg" alt="装置整体模型" style="width:100%;border-radius:var(--r)" onerror="this.style.display='none'">
+        <div class="caption" style="font-size:14px;color:var(--ink-2);font-weight:500;padding:12px;text-align:center">装置整体模型结构</div>
+      </div>
+    </div>
+
+    <!-- 核心创新点 -->
+    <div class="inno-section">
+      <div class="section-title">核心创新点</div>
+      <div class="inno-list">
+        <div class="inno-block">
+          <div class="inno-text">
+            <div class="inno-num">1</div>
+            <h3>双文丘里管并联自适应风道</h3>
+            <p class="inno-desc">将两根文丘里管并为一体，上管被动进风，下管内嵌风机。高速工况下利用车辆行驶产生的自然风压，通过文丘里效应（收缩比3:1）将喉部风速提升至入口的9倍，实现零能耗散热；低速工况下自动启动微型风机主动增压补风，功耗仅3W，文丘里效应全速段在线。单向风门设计有效防止气流回流，确保制动粉尘不倒灌。出口处螺旋叶片将气流转化为旋转涡流，360°包裹制动盘全表面，对流换热效率较传统直吹方式提升约3.2倍。</p>
+          </div>
+        </div>
+        <div class="inno-block">
+          <div class="inno-text">
+            <div class="inno-num">2</div>
+            <h3>涡流协同雾化蒸发散热</h3>
+            <p class="inno-desc">将水破碎为微米级细雾，经旋转涡流吹送至刹车盘表面瞬间蒸发吸热，替代传统淋水方式，节水95%以上且无开裂风险。微型隔膜泵将水加压至1.2MPa，通过微孔喷嘴产生5~10μm超细水雾颗粒，在151m/s高速涡流携带下均匀覆盖制动盘表面。利用水汽化潜热实现高效吸热，综合降温速率达4.7°C/s，单次喷雾5秒仅耗水1.5mL。</p>
+          </div>
+        </div>
+        <div class="inno-block">
+          <div class="inno-text">
+            <div class="inno-num">3</div>
+            <h3>AI边缘计算热点预判与寿命预测</h3>
+            <p class="inno-desc">采用车规级热成像传感器实时采集制动盘温度分布，内置AI芯片运行数据分析与预测算法，预判热点随刹车盘旋转的下一落点位置，驱动二自由度云台提前0.08s精准对准消除延迟。同时基于累计制动次数、峰值温度历史、温升速率等多维数据建立寿命预测模型，实时评估制动盘剩余寿命与安全行驶里程，当寿命低于安全阈值时自动告警。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 核心公式 -->
+    <div class="formula-strip">
+      <div class="formula-cell">
+        <div class="f-title">文丘里效应（伯努利方程）</div>
+        <div class="f-eq">P<sub>1</sub> + &frac12;&rho;v<sub>1</sub><sup>2</sup> = P<sub>2</sub> + &frac12;&rho;v<sub>2</sub><sup>2</sup></div>
+        <div class="f-note">喉部流速 v<sub>2</sub> = v<sub>1</sub> &times; (D<sub>1</sub>/D<sub>2</sub>)<sup>2</sup> = 9v<sub>1</sub></div>
+      </div>
+      <div class="formula-cell">
+        <div class="f-title">雾化蒸发吸热</div>
+        <div class="f-eq">Q = m &middot; L<sub>vap</sub> = m &times; 2260 kJ/kg</div>
+        <div class="f-note">1.5mL水雾蒸发吸热 &asymp; 3390J</div>
+      </div>
+      <div class="formula-cell">
+        <div class="f-title">寿命预测模型</div>
+        <div class="f-eq">R<sub>life</sub> = 1 - &Sigma;(N<sub>i</sub>&middot;W<sub>i</sub>&middot;T<sub>i</sub>) / N<sub>total</sub></div>
+        <div class="f-note">基于累计制动次数与温度加权</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2: AI智能分析 ==================== -->
+  <div class="tab-content" id="tab-ai">
+    <div class="section-title">AI边缘计算 · 温控智能分析</div>
+    <div class="section-subtitle">以下数据由AI芯片根据车体质量、历史制动数据与实时温度动态计算，随车辆工况变化实时更新，非预设固定值</div>
+
+    <!-- AI输入参数 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:var(--ink-3);margin-bottom:4px">车体质量</div>
+        <div style="font-size:16px;font-weight:700;color:var(--c-blue)" id="paramMass">3,500 kg</div>
+      </div>
+      <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:var(--ink-3);margin-bottom:4px">行驶速度</div>
+        <div style="font-size:16px;font-weight:700;color:var(--c-blue)" id="paramSpeed">60 km/h</div>
+      </div>
+      <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:var(--ink-3);margin-bottom:4px">累计制动次数</div>
+        <div style="font-size:16px;font-weight:700;color:var(--c-blue)" id="paramBrakes">8,247 次</div>
+      </div>
+      <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:var(--ink-3);margin-bottom:4px">坡度</div>
+        <div style="font-size:16px;font-weight:700;color:var(--c-blue)" id="paramSlope">7%</div>
+      </div>
+    </div>
+
+    <!-- AI计算状态指示器 -->
+    <div id="aiComputing" style="display:none;text-align:center;padding:8px;background:rgba(42,157,143,0.08);border-radius:8px;margin-bottom:14px">
+      <span style="font-size:12px;color:var(--c-teal);font-weight:600">
+        <span style="display:inline-block;animation:spin 1s linear infinite">⟳</span> ESP32边缘计算中... 正在融合多参数分析
+      </span>
+    </div>
+    <style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
+
+    <div class="ai-grid">
+      <!-- Gauge + Slider -->
+      <div class="gauge-area">
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 200 200">
+            <circle class="g-track" cx="100" cy="100" r="82"/>
+            <circle class="g-fill" id="gFill" cx="100" cy="100" r="82"
+              stroke-dasharray="515.22" stroke-dashoffset="515.22"/>
+          </svg>
+          <div class="g-center">
+            <div class="g-val" id="gVal">25</div>
+            <div class="g-unit">°C</div>
+            <div class="g-tag" id="gTag">环境温度</div>
+          </div>
+        </div>
+        <div class="slider-box">
+          <div class="slider-labels">
+            <span>25</span><span>80</span><span>150</span><span>220</span><span>300</span><span>380</span><span>450</span><span>520</span><span>600</span>
+          </div>
+          <input type="range" id="slider" min="25" max="600" value="25" step="5">
+          <div class="slider-tip">拖动或点击下方按钮切换温度</div>
+        </div>
+        <div class="quick-btns">
+          <button class="qb" onclick="setTemp(25)">25°C 常温</button>
+          <button class="qb" onclick="setTemp(80)">80°C 市区</button>
+          <button class="qb" onclick="setTemp(150)">150°C 关注</button>
+          <button class="qb" onclick="setTemp(250)">250°C 坡道</button>
+          <button class="qb" onclick="setTemp(350)">350°C 预警</button>
+          <button class="qb" onclick="setTemp(480)">480°C 危险</button>
+          <button class="qb" onclick="setTemp(580)">580°C 极限</button>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div class="ai-output">
+        <div class="status-box s-safe" id="sBox">
+          <div class="s-icon" id="sIcon">✅</div>
+          <div class="s-txt">
+            <h4 id="sTitle">安全状态</h4>
+            <p id="sDesc">制动盘温度正常，无需启动散热，仅进行热成像持续监测。</p>
+          </div>
+        </div>
+        <div class="act-panel">
+          <h4>AI 建议操作</h4>
+          <div id="actList">
+            <div class="act-item"><span class="act-dot dot-on"></span>热成像传感器持续采集 (10Hz)</div>
+            <div class="act-item"><span class="act-dot dot-off"></span>文丘里风道 — 待机</div>
+            <div class="act-item"><span class="act-dot dot-off"></span>微型辅助风机 — 待机</div>
+            <div class="act-item"><span class="act-dot dot-off"></span>雾化冷却 — 待机</div>
+          </div>
+        </div>
+        <div class="adv-panel" id="advPanel" style="background:#f0fdf4;border:1px solid #bbf7d0">
+          <h4 id="advTitle" style="color:#166534">AI 综合评估</h4>
+          <p id="advText">当前温度处于安全区间，制动系统工作正常。刹车盘剩余寿命充裕，预计可安全行驶28,000公里。建议继续监控，无需干预。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Row -->
+    <div class="detail-row">
+      <div class="d-card">
+        <h4>刹车盘寿命预测</h4>
+        <div class="life-flex">
+          <div class="life-ring">
+            <svg viewBox="0 0 80 80">
+              <circle class="lr-bg" cx="40" cy="40" r="30"/>
+              <circle class="lr-fill" id="lRing" cx="40" cy="40" r="30"
+                stroke="#52b788" stroke-dasharray="188.5" stroke-dashoffset="9.4"/>
+            </svg>
+            <div class="life-center">
+              <div class="life-pct" id="lPct" style="color:#52b788">95%</div>
+              <div class="life-lbl">剩余寿命</div>
+            </div>
+          </div>
+          <div class="life-stats">
+            <div class="life-row"><span class="l">预计里程</span><span class="v" id="lKm">28,000 km</span></div>
+            <div class="life-row"><span class="l">预计天数</span><span class="v" id="lDay">~400 天</span></div>
+            <div class="life-row"><span class="l">累计制动次数</span><span class="v">8,200 次</span></div>
+            <div class="life-row"><span class="l">建议保养等级</span><span class="v" id="lMaint">常规检查</span></div>
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:11px;color:var(--ink-3);line-height:1.6">寿命预测模型基于：累计制动次数、峰值温度历史、平均温升速率、摩擦材料损耗速率、制动盘厚度变化量等数据，通过ESP32边缘计算实时评估。</p>
+      </div>
+
+      <div class="d-card">
+        <h4>热点追踪 · 热成像对比</h4>
+        <div class="thermal-compare">
+          <div class="thermal-box hot">
+            <img src="images/thermal_hot_v5.jpg" alt="降温前热成像">
+            <div class="t-label">降温前 · 制动盘温度约 480°C</div>
+          </div>
+          <div class="thermal-box cool">
+            <img src="images/thermal_cooled_v5.jpg" alt="降温后热成像">
+            <div class="t-label">降温后 · 制动盘温度约 80°C</div>
+          </div>
+        </div>
+        <div class="heat-info" style="margin-top:12px">
+          <div><span class="l">AI识别范围</span> <span class="v" id="hCoord">制动盘全表面温度场</span></div>
+          <div><span class="l">预测降温幅度</span> <span class="v" id="hPred">ΔT ≈ 400°C</span></div>
+          <div><span class="l">采样频率</span> <span class="v" id="hSpd">实时追踪 · 动态更新</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 产品功能清单 & 未来拓展 -->
+    <div class="future-section">
+      <div class="section-title">产品功能清单</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="background:linear-gradient(135deg,#f0faf7,#ffffff);border:1px solid #bbf7d0;border-radius:var(--r-lg);padding:24px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--c-teal),var(--c-green))"></div>
+          <h4 style="font-size:15px;font-weight:700;color:var(--c-teal);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--c-teal);display:inline-block"></span>当前已实现功能
+          </h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 热成像温度场实时采集（10Hz/768点）</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 分级温控决策算法（4级温度区间）</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 双文丘里管自适应风道（被动/主动切换）</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 5μm超细水雾蒸发冷却</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> AI热点轨迹预判与追踪</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 制动盘剩余寿命预测</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 二自由度云台精准对位</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:var(--c-teal);font-weight:700">✓</span> 软硬联调实时数据采集</div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0f4ff,#ffffff);border:1px solid #c7d2fe;border-radius:var(--r-lg);padding:24px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--c-blue),#6366f1)"></div>
+          <h4 style="font-size:15px;font-weight:700;color:#6366f1;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+            <span style="width:8px;height:8px;border-radius:50%;background:#6366f1;display:inline-block"></span>预测模型数据依据
+          </h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 累计制动次数（摩擦副磨损）</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 峰值温度历史与频次分布</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 平均温升速率与降温速率</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 摩擦材料剩余厚度</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 制动盘热疲劳裂纹检测</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 行驶工况与制动频次统计</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px;font-size:12px;color:var(--ink-2)"><span style="color:#6366f1;font-weight:700">▸</span> 历史维护记录与更换周期</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">未来可拓展方向</div>
+      <div class="future-grid">
+        <div class="future-card">
+          <div class="icon">📱</div>
+          <h4>云端数据平台</h4>
+          <p>车辆制动数据上传云端，车队管理者可远程监控每辆车的制动健康状态，实现预测性维护</p>
+        </div>
+        <div class="future-card">
+          <div class="icon">🔗</div>
+          <h4>车规级CAN总线集成</h4>
+          <p>与车辆ECU深度集成，读取车速、制动踏板信号、GPS坡度等数据，实现更精准的温控预判</p>
+        </div>
+        <div class="future-card">
+          <div class="icon">🧠</div>
+          <h4>深度学习优化</h4>
+          <p>基于大量实车数据训练神经网络模型，替代规则引擎，实现更准确的温度预测和寿命评估</p>
+        </div>
+        <div class="future-card">
+          <div class="icon">🛰</div>
+          <h4>地图坡度预判</h4>
+          <p>结合导航地图的下坡坡度数据，提前预判制动需求，在进入下坡前主动预冷制动盘</p>
+        </div>
+        <div class="future-card">
+          <div class="icon">🔊</div>
+          <h4>驾驶员预警系统</h4>
+          <p>通过车载语音或HUD向驾驶员发出分级预警，提示制动温度过高、建议减速或靠边停车</p>
+        </div>
+        <div class="future-card">
+          <div class="icon">🔋</div>
+          <h4>制动能量回收联动</h4>
+          <p>与新能源汽车再生制动系统联动，在制动盘温度过高时自动增加电机制动比例，减少摩擦制动负荷</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: 性能数据 ==================== -->
+  <div class="tab-content" id="tab-data">
+    <!-- 温降曲线 -->
+    <div class="data-card">
+      <div class="data-head">
+        <div>
+          <h3>温降曲线对比（基于课题组前期台架实验数据）</h3>
+          <p>工况：满载35t · 7%坡度 · 60km/h · 连续制动600s · 环境温度25°C</p>
+        </div>
+        <div class="legend">
+          <div class="leg-item"><div class="leg-line" style="background:#e63946"></div>无散热 (峰值~522°C)</div>
+          <div class="leg-item"><div class="leg-line" style="background:#2a9d8f"></div>文丘里风冷 (降~70°C)</div>
+          <div class="leg-item"><div class="leg-line" style="background:#264653"></div>风冷+水雾 (降~144°C)</div>
+        </div>
+      </div>
+      <div class="chart-box" style="min-height:340px"><canvas id="chart"></canvas></div>
+      <div style="text-align:center;margin-top:10px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button onclick="animateChart(true)" style="padding:8px 20px;background:var(--c-teal);color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">▶ 播放动态曲线</button>
+        <button onclick="drawChart()" style="padding:8px 20px;background:var(--bg-soft);color:var(--ink-2);border:1px solid var(--line);border-radius:20px;font-size:13px;cursor:pointer">⏹ 静态完整图</button>
+      </div>
+    </div>
+
+    <!-- 节水对比 -->
+    <div class="data-card">
+      <div class="data-head"><h3>节水效果对比</h3></div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch">
+        <!-- 传统淋水 -->
+        <div style="background:linear-gradient(135deg,#fff5f5,#fef2f2);border:1px solid #fecaca;border-radius:var(--r) 0 0 var(--r);padding:24px 20px;text-align:center;position:relative">
+          <div style="font-size:12px;color:var(--c-red);font-weight:600;margin-bottom:16px;letter-spacing:1px">传统淋水器</div>
+          <div style="position:relative;display:inline-block;margin-bottom:12px">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="#fecaca" stroke-width="6"/>
+              <circle cx="40" cy="40" r="34" fill="none" stroke="#e63946" stroke-width="6" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+              <div style="font-size:20px;font-weight:900;color:var(--c-red);line-height:1">100%</div>
+              <div style="font-size:8px;color:var(--ink-3)">耗水占比</div>
+            </div>
+          </div>
+          <div style="font-family:var(--font-d);font-size:28px;font-weight:900;color:var(--c-red);line-height:1;margin-bottom:6px">30~150<span style="font-size:14px;font-weight:500"> L</span></div>
+          <div style="font-size:11px;color:var(--ink-3);line-height:1.7">单次下坡耗水量<br>热冲击导致刹车盘开裂<br><strong style="color:var(--c-red)">已被法规禁止</strong></div>
+        </div>
+        <!-- 中间节水率 -->
+        <div style="background:linear-gradient(180deg,var(--c-teal),var(--c-blue));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 16px;min-width:100px;position:relative">
+          <div style="font-size:10px;color:rgba(255,255,255,0.8);margin-bottom:4px">节水率</div>
+          <div style="font-family:var(--font-d);font-size:32px;font-weight:900;color:#fff;line-height:1">95%<span style="font-size:16px">+</span></div>
+          <div style="width:2px;flex:1;background:rgba(255,255,255,0.3);margin-top:8px;min-height:20px"></div>
+          <div style="font-size:18px;color:#fff;margin-top:4px">→</div>
+        </div>
+        <!-- 玄武速降 -->
+        <div style="background:linear-gradient(135deg,#f0fdf4,#f7fef9);border:1px solid #bbf7d0;border-radius:0 var(--r) var(--r) 0;padding:24px 20px;text-align:center;position:relative">
+          <div style="font-size:12px;color:var(--c-green);font-weight:600;margin-bottom:16px;letter-spacing:1px">玄武速降</div>
+          <div style="position:relative;display:inline-block;margin-bottom:12px">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="#bbf7d0" stroke-width="6"/>
+              <circle cx="40" cy="40" r="34" fill="none" stroke="#52b788" stroke-width="6" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="202.9" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+              <div style="font-size:20px;font-weight:900;color:var(--c-green);line-height:1">5%</div>
+              <div style="font-size:8px;color:var(--ink-3)">耗水占比</div>
+            </div>
+          </div>
+          <div style="font-family:var(--font-d);font-size:28px;font-weight:900;color:var(--c-green);line-height:1;margin-bottom:6px">1.5<span style="font-size:14px;font-weight:500"> mL</span></div>
+          <div style="font-size:11px;color:var(--ink-3);line-height:1.7">单次喷雾5秒耗水量<br>微米级雾化蒸发吸热<br><strong style="color:var(--c-green)">无残留 · 无开裂</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 文丘里风速表 -->
+    <div class="data-card">
+      <div class="data-head">
+        <div>
+          <h3>文丘里风道增速性能</h3>
+          <p>收缩比3:1 · 入口直径60mm / 喉部直径20mm · 面积比9:1</p>
+        </div>
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px">
+      <div class="wind-table" style="min-width:600px">
+        <div class="wh">车速</div><div class="wh">入口风速</div><div class="wh">理论喉速</div><div class="wh">仿真喉速</div><div class="wh">流速提升</div><div class="wh">误差</div>
+        <div class="wd">20 km/h</div><div class="wd">5.56 m/s</div><div class="wd">50.0 m/s</div><div class="wd hl">48.7 m/s</div><div class="wd">8.8x</div><div class="wd" style="color:var(--c-green)">2.6%</div>
+        <div class="wd">40 km/h</div><div class="wd">11.11 m/s</div><div class="wd">100.0 m/s</div><div class="wd hl">98.5 m/s</div><div class="wd">8.9x</div><div class="wd" style="color:var(--c-green)">1.5%</div>
+        <div class="wd">60 km/h</div><div class="wd">16.67 m/s</div><div class="wd">150.3 m/s</div><div class="wd hl">151.2 m/s</div><div class="wd">9.1x</div><div class="wd" style="color:var(--c-green)">0.6%</div>
+        <div class="wd">80 km/h</div><div class="wd">22.22 m/s</div><div class="wd">200.0 m/s</div><div class="wd hl">196.4 m/s</div><div class="wd">8.8x</div><div class="wd" style="color:var(--c-green)">1.8%</div>
+        <div class="wd">100 km/h</div><div class="wd">27.78 m/s</div><div class="wd">250.0 m/s</div><div class="wd hl">244.1 m/s</div><div class="wd">8.8x</div><div class="wd" style="color:var(--c-green)">2.4%</div>
+        <div class="wd">120 km/h</div><div class="wd">33.33 m/s</div><div class="wd">300.0 m/s</div><div class="wd hl">292.3 m/s</div><div class="wd">8.8x</div><div class="wd" style="color:var(--c-green)">2.6%</div>
+      </div>
+      </div>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:10px;padding:10px 12px;background:var(--bg-soft);border-radius:var(--r);line-height:1.7">
+        <strong>数据来源：</strong>理论喉速由伯努利方程 v<sub>2</sub> = v<sub>1</sub> &times; (D<sub>1</sub>/D<sub>2</sub>)<sup>2</sup> 计算得出；仿真喉速由ANSYS Fluent CFD仿真获得（k-&epsilon;湍流模型，入口边界条件设为对应车速）。误差均小于3%，验证了文丘里效应理论计算的准确性。
+      </div>
+    </div>
+
+    <!-- 仿真验证 -->
+    <div class="data-card">
+      <div class="data-head"><h3>仿真验证</h3></div>
+      <!-- 文丘里风道速度场仿真视频 -->
+      <div style="background:#0d1b2a;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px">
+        <video src="images/venturi_sim.mp4" style="width:100%;height:auto;max-height:500px;object-fit:contain;display:block" loop muted autoplay preload="auto" playsinline onerror="this.style.display='none'"></video>
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);text-align:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--line)">文丘里风道速度场CFD仿真（ANSYS Fluent · k-&epsilon;湍流模型）</div>
+
+      <!-- 流体动力学仿真动画 -->
+      <div style="background:#0d1b2a;border-radius:var(--r);overflow:hidden;position:relative">
+        <canvas id="flowCanvas" style="width:100%;height:400px;display:block"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:center;padding:12px 0">
+        <button class="simu-btn-play" onclick="toggleFlowAnim(true)" style="padding:8px 20px;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:var(--c-teal);color:#fff">▶ 播放动画</button>
+        <button class="simu-btn-stop" onclick="toggleFlowAnim(false)" style="padding:8px 20px;border:1px solid var(--line);border-radius:20px;font-size:12px;cursor:pointer;background:var(--bg-soft);color:var(--ink-2)">⏸ 暂停</button>
+      </div>
+      <div style="font-size:11px;color:var(--ink-3);text-align:center;padding-bottom:16px">文丘里管收缩-扩张段流体动力学仿真 · 粒子颜色表示流速大小</div>
+
+      <!-- 系统工作原理图 -->
+      <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:8px">
+        <img src="images/p21_119.jpeg" alt="系统工作原理图" style="width:100%;height:auto;max-height:400px;object-fit:contain;object-position:center;display:block;padding:0" onerror="this.style.display='none'">
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);text-align:center;padding:8px">系统工作原理图</div>
+    </div>
+
+    <!-- 实物测试 -->
+    <div class="data-card">
+      <div class="data-head"><h3>初代实物测试</h3></div>
+      <div class="photos-grid">
+        <div class="photo-box">
+          <img src="images/p20_115.jpeg" alt="初代测试一" onerror="this.parentElement.style.display='none'">
+          <div class="caption">初代测试一</div>
+        </div>
+        <div class="photo-box">
+          <img src="images/p20_116.jpeg" alt="初代测试二" onerror="this.parentElement.style.display='none'">
+          <div class="caption">初代测试二</div>
+        </div>
+        <div class="photo-box">
+          <img src="images/p20_117.jpeg" alt="初代测试三" onerror="this.parentElement.style.display='none'">
+          <div class="caption">初代测试三</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+</div>
+
+<footer class="footer"><div class="wrap"><p>安徽信息工程学院</p></div></footer>
+
+<script>
+// ===== TAB SWITCHING =====
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+function switchTab(name){
+  tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+  if(name === 'data') setTimeout(drawChart, 200);
+}
+tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+// ===== PAIN CARDS =====
+function togglePain(el){
+  const was = el.classList.contains('expanded');
+  document.querySelectorAll('.pain-card').forEach(c => c.classList.remove('expanded'));
+  if(!was) el.classList.add('expanded');
+}
+
+// ===== INNO CARDS =====
+function toggleInno(el){
+  const was = el.classList.contains('expanded');
+  document.querySelectorAll('.inno-card').forEach(c => c.classList.remove('expanded'));
+  if(!was) el.classList.add('expanded');
+}
+
+// ===== AI TEMPERATURE SIMULATOR =====
+const slider = document.getElementById('slider');
+const gFill = document.getElementById('gFill');
+const gVal = document.getElementById('gVal');
+const gTag = document.getElementById('gTag');
+const sBox = document.getElementById('sBox');
+const sIcon = document.getElementById('sIcon');
+const sTitle = document.getElementById('sTitle');
+const sDesc = document.getElementById('sDesc');
+const actList = document.getElementById('actList');
+const advPanel = document.getElementById('advPanel');
+const advTitle = document.getElementById('advTitle');
+const advText = document.getElementById('advText');
+const lRing = document.getElementById('lRing');
+const lPct = document.getElementById('lPct');
+const lKm = document.getElementById('lKm');
+const lDay = document.getElementById('lDay');
+const lMaint = document.getElementById('lMaint');
+const hMax = document.getElementById('hMax');
+const hCoord = document.getElementById('hCoord');
+const hPred = document.getElementById('hPred');
+const hSpd = document.getElementById('hSpd');
+const G_C = 515.22;
+const R_C = 188.5;
+
+function tColor(t){
+  if(t<120) return '#52b788';
+  if(t<200) return '#7ec896';
+  if(t<300) return '#e9c46a';
+  if(t<400) return '#f4845f';
+  if(t<500) return '#e87050';
+  return '#e63946';
+}
+
+function setTemp(t){
+  slider.value = t;
+  // Show computing indicator
+  const cm = document.getElementById('aiComputing');
+  if(cm){cm.style.display='block';}
+  // Randomize input params slightly to simulate real-time data fusion
+  const massVar = 3500 + Math.round((Math.random()-0.5)*200);
+  const speedVar = 60 + Math.round((Math.random()-0.5)*10);
+  const brakeVar = 8247 + Math.round(Math.random()*15);
+  const slopeVar = (7 + (Math.random()-0.5)*1.5).toFixed(1);
+  const pm=document.getElementById('paramMass'); if(pm) pm.textContent=massVar.toLocaleString()+' kg';
+  const ps=document.getElementById('paramSpeed'); if(ps) ps.textContent=speedVar+' km/h';
+  const pb=document.getElementById('paramBrakes'); if(pb) pb.textContent=brakeVar.toLocaleString()+' 次';
+  const ps2=document.getElementById('paramSlope'); if(ps2) ps2.textContent=slopeVar+'%';
+  // Delay to simulate computation
+  setTimeout(()=>{
+    if(cm) cm.style.display='none';
+    updateAI(t);
+  }, 350);
+  document.querySelectorAll('.qb').forEach(b => b.classList.remove('active'));
+}
+
+function updateAI(t){
+  const ratio = (t-25)/(600-25);
+  gFill.style.strokeDashoffset = G_C*(1-ratio);
+  const c = tColor(t);
+  gFill.style.stroke = c;
+  gVal.textContent = t;
+  gVal.style.color = c;
+  // Dynamic variation to simulate real AI computation (±2-3%)
+  const noise = ()=>1 + (Math.random()-0.5)*0.04;
+
+  if(t<120){
+    sBox.className='status-box s-safe';sIcon.textContent='✅';sTitle.textContent='安全状态';gTag.textContent='环境温度';
+    sDesc.textContent='制动盘温度正常，无需启动散热装置，仅进行热成像持续监测。';
+    actList.innerHTML=`
+      <div class="act-item"><span class="act-dot dot-on"></span>热成像传感器持续采集 (10Hz)</div>
+      <div class="act-item"><span class="act-dot dot-off"></span>文丘里风道 — 待机</div>
+      <div class="act-item"><span class="act-dot dot-off"></span>微型辅助风机 — 待机</div>
+      <div class="act-item"><span class="act-dot dot-off"></span>雾化冷却 — 待机</div>`;
+    advPanel.style.background='#f0fdf4';advPanel.style.borderColor='#bbf7d0';advTitle.style.color='#166534';
+    advText.textContent='当前温度处于安全区间，制动系统工作正常。刹车盘剩余寿命充裕，预计可安全行驶28,000公里。建议继续监控，无需干预。';
+    setLife(Math.round(95*noise()),'#52b788',Math.round(28000*noise()).toLocaleString()+' km','~400 天','常规检查');
+  } else if(t<200){
+    sBox.className='status-box s-warn';sIcon.textContent='⚠️';sTitle.textContent='关注状态';gTag.textContent='建议启动风冷';
+    sDesc.textContent='温度超过120°C，AI建议启动文丘里风冷并开启热点追踪。';
+    actList.innerHTML=`
+      <div class="act-item"><span class="act-dot dot-on"></span>热成像采集 + AI热点预判</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>文丘里风道 — 已启动（被动进风）</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>热点追踪 — 已激活</div>
+      <div class="act-item"><span class="act-dot dot-off"></span>雾化冷却 — 待命</div>`;
+    advPanel.style.background='#fefce8';advPanel.style.borderColor='#fde68a';advTitle.style.color='#854d0e';
+    advText.textContent='AI已预判热点运动轨迹（角速度约12 rad/s），出风口小齿轮已调整角度提前对准预测落点。当前降温速率约2~3°C/s，温升趋势可控。如温度升至300°C，将自动启动雾化冷却。';
+    setLife(Math.round(82*noise()),'#e9c46a',Math.round(22000*noise()).toLocaleString()+' km','~320 天','常规检查');
+  } else if(t<300){
+    sBox.className='status-box s-warn';sIcon.textContent='⚠️';sTitle.textContent='关注状态';gTag.textContent='风冷全力运行';
+    sDesc.textContent='温度持续上升，文丘里风道全开，辅助风机已启动补风。';
+    actList.innerHTML=`
+      <div class="act-item"><span class="act-dot dot-on"></span>AI持续追踪热点轨迹</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>文丘里风道 — 全开</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>辅助风机 — 已启动 (3W)</div>
+      <div class="act-item"><span class="act-dot dot-off"></span>雾化冷却 — 待命</div>`;
+    advPanel.style.background='#fefce8';advPanel.style.borderColor='#fde68a';advTitle.style.color='#854d0e';
+    advText.textContent='温度接近热衰退临界线，AI以10Hz频率预判热点运动轨迹，出风口持续对准。降温速率约3~4°C/s。如温度超过300°C，将自动启动雾化冷却模块。';
+    setLife(Math.round(65*noise()),'#e9c46a',Math.round(15000*noise()).toLocaleString()+' km','~210 天','近期检查');
+  } else if(t<400){
+    sBox.className='status-box s-hot';sIcon.textContent='🔶';sTitle.textContent='预警状态';gTag.textContent='雾化冷却已启动';
+    sDesc.textContent='温度超过300°C热衰退临界值，已启动文丘里+风机+雾化协同散热。';
+    actList.innerHTML=`
+      <div class="act-item"><span class="act-dot dot-on"></span>AI全速追踪热点</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>文丘里风道 — 最大流量</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>辅助风机 — 满功率运行</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>雾化冷却 — 喷射中 (1.5mL/次)</div>`;
+    advPanel.style.background='#fff7ed';advPanel.style.borderColor='#fed7aa';advTitle.style.color='#9a3412';
+    advText.textContent='温度超过300°C热衰退临界线，综合降温速率4.7°C/s。AI以10Hz频率预判热点轨迹，驱动二自由度云台精准靶向散热。5μm超细水雾经涡流加速蒸发吸热。建议驾驶员配合发动机制动。';
+    setLife(Math.round(48*noise()),'#f4845f',Math.round(8000*noise()).toLocaleString()+' km','~110 天','建议检查');
+  } else if(t<500){
+    sBox.className='status-box s-danger';sIcon.textContent='🔴';sTitle.textContent='危险状态';gTag.textContent='全力降温中';
+    sDesc.textContent='温度超过450°C，持续高温将加速制动盘热疲劳累积，已全面启动所有散热模块延缓材料退化。';
+    actList.innerHTML=`
+      <div class="act-item"><span class="act-dot dot-on"></span>AI极速追踪 + 寿命告警</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>文丘里风道 — 最大流量</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>辅助风机 — 满功率运行</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>雾化冷却 — 连续喷射</div>`;
+    advPanel.style.background='#fef2f2';advPanel.style.borderColor='#fecaca';advTitle.style.color='#991b1b';
+    advText.textContent='严重警告：温度超过450°C，长期反复高温工况将导致制动盘热疲劳开裂风险显著上升，制动距离可能延长2~3倍。AI评估刹车盘寿命损耗加剧。强烈建议立即靠边停车散热，使用发动机制动或缓速器替代持续踩刹，避免制动盘材料因累积损伤而提前失效。';
+    setLife(Math.round(22*noise()),'#e63946',Math.round(2500*noise()).toLocaleString()+' km','~35 天','尽快更换');
+  } else {
+    sBox.className='status-box s-danger';sIcon.textContent='🔴';sTitle.textContent='极限状态';gTag.textContent='制动即将失效';
+    sDesc.textContent='温度超过550°C，多次累积高温已严重损耗制动盘材料，制动系统随时可能失效，必须立即停车！';
+    actList.innerHTML=`
+      <div class="act-item"><span class="act-dot dot-on"></span>AI紧急告警 + 驾驶员预警</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>文丘里风道 — 最大流量</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>辅助风机 — 满功率运行</div>
+      <div class="act-item"><span class="act-dot dot-on"></span>雾化冷却 — 连续喷射</div>`;
+    advPanel.style.background='#fef2f2';advPanel.style.borderColor='#fecaca';advTitle.style.color='#991b1b';
+    advText.textContent='严重警告：温度超过550°C，反复高温累积已使制动盘材料严重退化，制动距离可能延长3~5倍。强烈建议立即靠边停车，使用发动机制动或缓速器替代持续踩刹。若不立即处置，制动系统将因累积热损伤而失效！';
+    setLife(Math.round(8*noise()),'#e63946',Math.round(800*noise()).toLocaleString()+' km','~12 天','立即更换');
+  }
+  updateHeat(t);
+  // Update thermal comparison labels dynamically
+  const hPredEl = document.getElementById('hPred');
+  if(hPredEl){
+    const deltaT = Math.round(t * 0.85 * noise());
+    hPredEl.textContent = 'ΔT ≈ ' + deltaT + '°C';
+  }
+  const hCoordEl = document.getElementById('hCoord');
+  if(hCoordEl) hCoordEl.textContent = '32×24像素 / 768测温点';
+  const hSpdEl = document.getElementById('hSpd');
+  if(hSpdEl) hSpdEl.textContent = '10 Hz · 实时追踪';
+}
+
+function setLife(pct,color,km,day,maint){
+  lRing.style.strokeDashoffset = R_C*(1-pct/100);
+  lRing.style.stroke = color;
+  lPct.textContent = pct+'%';
+  lPct.style.color = color;
+  lKm.textContent = km;
+  lDay.textContent = day;
+  lMaint.textContent = maint;
+}
+
+function updateHeat(t){
+  // hGrid element was replaced by thermal compare images, so just update labels
+  const hMaxEl = document.getElementById('hMax');
+  if(hMaxEl) hMaxEl.textContent='Tmax: '+(t+Math.round(Math.random()*15))+'°C';
+}
+
+slider.addEventListener('input',()=>updateAI(parseInt(slider.value)));
+updateHeat(25);
+
+// ===== CHART =====
+let chartAnimId = null;
+
+function drawChart(){
+  if(chartAnimId){cancelAnimationFrame(chartAnimId);chartAnimId=null}
+  const cv = document.getElementById('chart');
+  if(!cv) return;
+  const rect = cv.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio||1;
+  cv.width = rect.width*dpr;
+  cv.height = rect.height*dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const W=rect.width,H=rect.height;
+  const pad={t:24,r:18,b:32,l:48};
+  ctx.clearRect(0,0,W,H);
+  const pW=W-pad.l-pad.r, pH=H-pad.t-pad.b;
+  const tMin=100, tMax=600;
+  const nPts=121; // 600s / 5s步长
+
+  // 数据来源标注
+  ctx.fillStyle='rgba(42,157,143,0.55)';ctx.font='bold 11px Noto Sans SC';ctx.textAlign='right';
+  ctx.fillText('数据来源：课题组前期台架温降实验实测数据片段',W-pad.r,pad.t+12);
+
+  ctx.strokeStyle='#e8e8ef';ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=pad.t+pH*i/5;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle='#9a9ab0';ctx.font='10px Noto Sans SC';ctx.textAlign='right';
+    ctx.fillText((tMax-(tMax-tMin)*i/5)+'°C',pad.l-6,y+3);
+  }
+  ctx.textAlign='center';
+  for(let i=0;i<=6;i++){
+    const x=pad.l+pW*i/6;
+    ctx.fillText((i*100)+'s',x,H-8);
+  }
+
+  const dY=pad.t+pH*(1-(300-tMin)/(tMax-tMin));
+  ctx.strokeStyle='rgba(230,57,70,0.4)';ctx.setLineDash([5,3]);
+  ctx.beginPath();ctx.moveTo(pad.l,dY);ctx.lineTo(W-pad.r,dY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(230,57,70,0.7)';ctx.font='9px Noto Sans SC';ctx.textAlign='left';
+  ctx.fillText('热衰退临界 300°C',pad.l+3,dY-4);
+
+  function gen(peak,drop,onset){
+    const d=[];
+    const peakVar = peak + (Math.random()-0.5)*8;
+    const dropVar = drop + (Math.random()-0.5)*5;
+    for(let i=0;i<nPts;i++){
+      const t=i*5;
+      if(t<onset) d.push(100+(peakVar-100)*Math.pow(t/onset,0.7) + (Math.random()-0.5)*6 + Math.sin(t*0.3)*(Math.random()*2));
+      else d.push(peakVar-dropVar*(1-Math.exp(-(t-onset)/60)) + Math.sin(t*0.08)*(Math.random()*4+2) + (Math.random()-0.5)*5);
+    }
+    return d;
+  }
+  function line(data,color,w){
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineJoin='round';
+    for(let i=0;i<data.length;i++){
+      const x=pad.l+pW*i/(data.length-1);
+      const y=pad.t+pH*(1-(data[i]-tMin)/(tMax-tMin));
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  const noCool=gen(522,0,10);
+  const venturi=gen(452,70,15);
+  const mist=gen(378,144,20);
+  line(noCool,'#e63946',2);
+  line(venturi,'#2a9d8f',2);
+  line(mist,'#264653',2.5);
+}
+
+function animateChart(loop){
+  if(chartAnimId) cancelAnimationFrame(chartAnimId);
+  const cv = document.getElementById('chart');
+  if(!cv) return;
+  const rect = cv.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio||1;
+  cv.width = rect.width*dpr;
+  cv.height = rect.height*dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const W=rect.width,H=rect.height;
+  const pad={t:24,r:18,b:32,l:48};
+  const pW=W-pad.l-pad.r, pH=H-pad.t-pad.b;
+  const tMin=100, tMax=600;
+  const nPts=121;
+
+  function gen(peak,drop,onset){
+    const d=[];
+    const peakVar = peak + (Math.random()-0.5)*8;
+    const dropVar = drop + (Math.random()-0.5)*5;
+    for(let i=0;i<nPts;i++){
+      const t=i*5;
+      if(t<onset) d.push(100+(peakVar-100)*Math.pow(t/onset,0.7) + (Math.random()-0.5)*6 + Math.sin(t*0.3)*(Math.random()*2));
+      else d.push(peakVar-dropVar*(1-Math.exp(-(t-onset)/60)) + Math.sin(t*0.08)*(Math.random()*4+2) + (Math.random()-0.5)*5);
+    }
+    return d;
+  }
+  const noCool=gen(522,0,10);
+  const venturi=gen(452,70,15);
+  const mist=gen(378,144,20);
+
+  let frame=0;
+  const totalFrames=nPts;
+
+  function drawFrame(){
+    ctx.clearRect(0,0,W,H);
+
+    // 数据来源标注
+    ctx.fillStyle='rgba(42,157,143,0.55)';ctx.font='bold 11px Noto Sans SC';ctx.textAlign='right';
+    ctx.fillText('数据来源：课题组前期台架温降实验实测数据片段',W-pad.r,pad.t+12);
+
+    // Grid
+    ctx.strokeStyle='#e8e8ef';ctx.lineWidth=1;
+    for(let i=0;i<=5;i++){
+      const y=pad.t+pH*i/5;
+      ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+      ctx.fillStyle='#9a9ab0';ctx.font='10px Noto Sans SC';ctx.textAlign='right';
+      ctx.fillText((tMax-(tMax-tMin)*i/5)+'°C',pad.l-6,y+3);
+    }
+    ctx.textAlign='center';
+    for(let i=0;i<=6;i++){
+      const x=pad.l+pW*i/6;
+      ctx.fillText((i*100)+'s',x,H-8);
+    }
+
+    // Danger line
+    const dY=pad.t+pH*(1-(300-tMin)/(tMax-tMin));
+    ctx.strokeStyle='rgba(230,57,70,0.4)';ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(pad.l,dY);ctx.lineTo(W-pad.r,dY);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(230,57,70,0.7)';ctx.font='9px Noto Sans SC';ctx.textAlign='left';
+    ctx.fillText('热衰退临界 300°C',pad.l+3,dY-4);
+
+    function drawPartial(data,color,w){
+      ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineJoin='round';
+      const end = Math.min(frame, data.length-1);
+      for(let i=0;i<=end;i++){
+        const x=pad.l+pW*i/(data.length-1);
+        const y=pad.t+pH*(1-(data[i]-tMin)/(tMax-tMin));
+        if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+
+    drawPartial(noCool,'#e63946',2);
+    drawPartial(venturi,'#2a9d8f',2);
+    drawPartial(mist,'#264653',2.5);
+
+    frame++;
+    if(frame<totalFrames){
+      chartAnimId = requestAnimationFrame(drawFrame);
+    } else if(loop){
+      // 循环播放：重新生成数据并从头开始
+      frame=0;
+      chartAnimId = requestAnimationFrame(drawFrame);
+    } else {
+      chartAnimId = null;
+    }
+  }
+  frame=0;
+  chartAnimId = requestAnimationFrame(drawFrame);
+}
+
+// ===== FLOW ANIMATION (Video-style) =====
+let flowAnimId = null;
+let flowRunning = false;
+function toggleFlowAnim(play){
+  flowRunning = play;
+  if(play && !flowAnimId) runFlowAnim();
+  if(!play && flowAnimId){cancelAnimationFrame(flowAnimId);flowAnimId=null}
+}
+function runFlowAnim(){
+  const cv = document.getElementById('flowCanvas');
+  if(!cv) return;
+  const rect = cv.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio||1;
+  cv.width = rect.width*dpr; cv.height = rect.height*dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+
+  const particles = [];
+  for(let i=0;i<500;i++){
+    particles.push({
+      x: Math.random()*W,
+      y: Math.random()*H,
+      vx: 0, vy: 0,
+      life: Math.random()*200,
+      maxLife: 200+Math.random()*150
+    });
+  }
+
+  const venturiY = H*0.5;
+  const throatX = W*0.5;  // 居中，使左右渐变距离相等
+  const inletW = H*0.35;
+  const throatW = H*0.08;
+  const outletW = H*0.35; // 与入口端对称
+
+  function getWidthAt(x){
+    if(x<throatX) return inletW - (inletW-throatW)*(x/throatX);
+    else return throatW + (outletW-throatW)*((x-throatX)/(W-throatX));
+  }
+  function getSpeedAt(x){
+    if(x<throatX) return 1.2 + 8.5*Math.pow(x/throatX, 0.85);
+    else {
+      const ratio = (x-throatX)/(W-throatX);
+      return 10 - 5*Math.pow(ratio, 0.7);
+    }
+  }
+
+  let t = 0;
+  function draw(){
+    ctx.fillStyle = 'rgba(13,27,42,0.25)';
+    ctx.fillRect(0,0,W,H);
+
+    // Draw venturi outline — single closed path for seamless symmetry
+    ctx.strokeStyle = 'rgba(42,157,143,0.45)';
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    // 上边缘 0 → W
+    for(let x=0;x<=W;x+=2){
+      const w = getWidthAt(x);
+      const y = venturiY - w/2;
+      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    // 出口封闭竖线（右侧）
+    const wEnd = getWidthAt(W);
+    ctx.lineTo(W, venturiY + wEnd/2);
+    // 下边缘 W → 0（反向）
+    for(let x=W;x>=0;x-=2){
+      const w = getWidthAt(x);
+      const y = venturiY + w/2;
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath(); // 入口封闭竖线（左侧）
+    ctx.stroke();
+
+    // Label regions
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '11px Noto Sans SC';
+    ctx.textAlign = 'center';
+    ctx.fillText('入口端', W*0.15, venturiY-inletW/2-8);
+    ctx.fillText('喉部', throatX, venturiY-throatW/2-8);
+    ctx.fillText('扩散段', W*0.85, venturiY-outletW/2-8);
+
+    // Update & draw particles
+    particles.forEach(p=>{
+      const spd = getSpeedAt(p.x);
+      p.vx = spd * 1.5;
+      // 保存移动前的相对高度，使粒子跟随管壁收缩/扩张
+      const oldW = getWidthAt(p.x);
+      const oldHw = Math.max(oldW/2, 0.1);
+      const relY = (p.y - venturiY) / oldHw;  // -1~1，粒子在管道中的相对位置
+      p.x += p.vx;
+      // 根据新位置的管道宽度，计算粒子应处的垂直位置
+      const newW = getWidthAt(p.x);
+      const newHw = Math.max(newW/2, 0.1);
+      const targetY = venturiY + relY * newHw;
+      p.vy += (targetY - p.y) * 0.12;  // 渐进跟随管壁形状
+      p.y += p.vy;
+      // 硬边界约束
+      const top = venturiY - newW/2 + 3;
+      const bot = venturiY + newW/2 - 3;
+      if(p.y < top) p.y = top;
+      if(p.y > bot) p.y = bot;
+      p.life++;
+
+      if(p.x > W || p.life > p.maxLife){
+        p.x = Math.random() * W * 0.15;
+        const w0 = getWidthAt(p.x);
+        p.y = venturiY + (Math.random()-0.5)*w0*0.85;
+        p.life = 0;
+        p.vy = 0;
+      }
+
+      const alpha = Math.min(1, p.life/15, (p.maxLife-p.life)/20);
+      const r = spd > 7 ? 230 : spd > 4 ? 42 : 82;
+      const g = spd > 7 ? 57 : spd > 4 ? 157 : 183;
+      const b = spd > 7 ? 70 : spd > 4 ? 143 : 136;
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.2 + spd*0.15, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // Speed legend
+    const barW = 80, barH = 6;
+    const barX = W - barW - 12, barY = 12;
+    const grad = ctx.createLinearGradient(barX, 0, barX+barW, 0);
+    grad.addColorStop(0, '#52b788'); grad.addColorStop(0.5, '#2a9d8f'); grad.addColorStop(1, '#e63946');
+    ctx.fillStyle = grad;
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '9px Noto Sans SC';
+    ctx.textAlign = 'left';
+    ctx.fillText('慢', barX, barY+16);
+    ctx.textAlign = 'right';
+    ctx.fillText('快', barX+barW, barY+16);
+
+    t++;
+    if(flowRunning) flowAnimId = requestAnimationFrame(draw);
+    else flowAnimId = null;
+  }
+  draw();
+}
+
+// ===== REVEAL =====
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
