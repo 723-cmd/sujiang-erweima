@@ -828,6 +828,10 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .dm-images .dm-img-box img{height:auto;width:100%}
   .feature-grid{grid-template-columns:1fr!important}
   .timeline-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  /* 节水对比移动端堆叠 */
+  .water-compare{grid-template-columns:1fr!important}
+  .water-compare > div:first-child{border-radius:var(--r) var(--r) 0 0!important}
+  .water-compare > div:last-child{border-radius:0 0 var(--r) var(--r)!important}
   /* 风速表滚动 */
   .wind-table{min-width:600px}
   .wind-table .wh,.wind-table .wd{padding:8px 6px;min-width:60px}
@@ -1134,7 +1138,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <p style="margin-top:8px">刹车盘峰值温降超<strong style="color:var(--c-red)">200℃</strong>，高速零能耗运行，适用货车、乘用车与新能源汽车，实现节能、节水、节材、减排协同效益，助力交通运输绿色低碳转型。</p>
       </div>
       <div class="intro-img">
-        <img src="images/intro_infographic.png" alt="玄武速降设计思路" style="width:100%;border-radius:var(--r);border:1px solid var(--line)" onerror="this.style.display='none'">
+        <img src="images/intro_infographic.jpg" alt="玄武速降设计思路" style="width:100%;border-radius:var(--r);border:1px solid var(--line)" onerror="this.style.display='none'">
       </div>
     </div>
 
@@ -1178,11 +1182,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">1</div><h4>并联式智能风道模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module1_flow.jpg" alt="并联风道流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module1_flow.png" alt="并联风道流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">温度控制逻辑流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module1_model.jpg" alt="并联风道模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module1_model.png" alt="并联风道模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">并联风道三维模型</div>
           </div>
         </div>
@@ -1192,11 +1196,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">2</div><h4>文丘里涡流增压管道模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module2_flow.jpg" alt="文丘里涡流流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module2_flow.png" alt="文丘里涡流流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">文丘里增压流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module2_model.jpg" alt="文丘里涡流模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module2_model.png" alt="文丘里涡流模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">涡流增压三维模型</div>
           </div>
         </div>
@@ -1206,11 +1210,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">3</div><h4>环形风道控制系统模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module3_flow.jpg" alt="环形风道控制流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module3_flow.png" alt="环形风道控制流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">环形风道控制流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module3_model.jpg" alt="环形风道控制模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module3_model.png" alt="环形风道控制模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">齿轮传动系统模型</div>
           </div>
         </div>
@@ -1220,11 +1224,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">4</div><h4>高压精细雾化蒸发系统模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module4_flow.jpg" alt="雾化蒸发流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module4_flow.png" alt="雾化蒸发流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">雾化蒸发系统流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module4_model.jpg" alt="雾化蒸发模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module4_model.png" alt="雾化蒸发模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">泵阀喷嘴三维模型</div>
           </div>
         </div>
@@ -1286,8 +1290,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <!-- 团队历程 -->
     <div class="section-title" style="margin-top:36px;margin-bottom:20px">团队历程</div>
     <div class="timeline-grid">
-      <div class="tl-card"><img src="images/timeline_01.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
-      <div class="tl-card"><img src="images/timeline_02.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_01.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_02.png" alt="" onerror="this.parentElement.style.display='none'"></div>
       <div class="tl-card"><img src="images/timeline_03.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
       <div class="tl-card"><img src="images/timeline_04.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
       <div class="tl-card"><img src="images/timeline_05.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
@@ -1534,7 +1538,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <!-- 节水对比 -->
     <div class="data-card">
       <div class="data-head"><h3>节水效果对比</h3></div>
-      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch">
+      <div class="water-compare" style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch">
         <!-- 传统淋水 -->
         <div style="background:linear-gradient(135deg,#fff5f5,#fef2f2);border:1px solid #fecaca;border-radius:var(--r) 0 0 var(--r);padding:24px 20px;text-align:center;position:relative">
           <div style="font-size:12px;color:var(--c-red);font-weight:600;margin-bottom:16px;letter-spacing:1px">传统淋水器</div>
@@ -1641,11 +1645,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
           <div class="gen-title"><span class="gen-num">01</span> 初代原型 · 原理验证</div>
           <div class="gen-imgs">
             <div class="gen-img-box">
-              <img src="images/gen1_1.png" alt="初代原型图1" onerror="this.parentElement.style.display='none'">
+              <img src="images/gen1_1.jpg" alt="初代原型图1" onerror="this.parentElement.style.display='none'">
               <div class="caption">初代原型 · 整体结构</div>
             </div>
             <div class="gen-img-box">
-              <img src="images/gen1_2.jpg" alt="初代原型图2" onerror="this.parentElement.style.display='none'">
+              <img src="images/gen1_2.png" alt="初代原型图2" onerror="this.parentElement.style.display='none'">
               <div class="caption">初代原型 · 风道模块</div>
             </div>
           </div>
@@ -1669,11 +1673,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
           <div class="gen-title"><span class="gen-num">03</span> 三代改进 · 性能强化</div>
           <div class="gen-imgs">
             <div class="gen-img-box">
-              <img src="images/gen3_1.jpg" alt="三代改进图1" onerror="this.parentElement.style.display='none'">
+              <img src="images/gen3_1.png" alt="三代改进图1" onerror="this.parentElement.style.display='none'">
               <div class="caption">三代 · 环形风道系统</div>
             </div>
             <div class="gen-img-box">
-              <img src="images/gen3_2.jpg" alt="三代改进图2" onerror="this.parentElement.style.display='none'">
+              <img src="images/gen3_2.png" alt="三代改进图2" onerror="this.parentElement.style.display='none'">
               <div class="caption">三代 · 整体结构模型</div>
             </div>
           </div>
