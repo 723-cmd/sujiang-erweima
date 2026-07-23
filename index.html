@@ -828,10 +828,6 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .dm-images .dm-img-box img{height:auto;width:100%}
   .feature-grid{grid-template-columns:1fr!important}
   .timeline-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  /* 节水对比移动端堆叠 */
-  .water-compare{grid-template-columns:1fr!important}
-  .water-compare > div:first-child{border-radius:var(--r) var(--r) 0 0!important}
-  .water-compare > div:last-child{border-radius:0 0 var(--r) var(--r)!important}
   /* 风速表滚动 */
   .wind-table{min-width:600px}
   .wind-table .wh,.wind-table .wd{padding:8px 6px;min-width:60px}
@@ -1538,7 +1534,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <!-- 节水对比 -->
     <div class="data-card">
       <div class="data-head"><h3>节水效果对比</h3></div>
-      <div class="water-compare" style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch">
         <!-- 传统淋水 -->
         <div style="background:linear-gradient(135deg,#fff5f5,#fef2f2);border:1px solid #fecaca;border-radius:var(--r) 0 0 var(--r);padding:24px 20px;text-align:center;position:relative">
           <div style="font-size:12px;color:var(--c-red);font-weight:600;margin-bottom:16px;letter-spacing:1px">传统淋水器</div>
@@ -1610,7 +1606,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <div class="data-head"><h3>仿真验证</h3></div>
       <!-- 文丘里风道速度场仿真视频 -->
       <div style="background:#0d1b2a;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px">
-        <img src="images/venturi_cfd.jpg" style="width:100%;height:auto;max-height:500px;object-fit:contain;display:block;background:#0d1b2a">
+        <img src="images/venturi_cfd.jpg" style="width:100%;height:auto;max-height:500px;object-fit:contain;display:block">
       </div>
       <div style="font-size:12px;color:var(--ink-3);text-align:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--line)">文丘里风道速度场CFD仿真（ANSYS Fluent · k-&epsilon;湍流模型）</div>
 
