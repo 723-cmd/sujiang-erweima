@@ -708,6 +708,48 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .wind-table .wd:hover{background:#e8f4f0;transform:scale(1.03)}
 .wind-table .wd.hl{color:var(--c-teal);font-weight:600}
 
+/* Iteration / gen list */
+.gen-list{
+  display:flex;flex-direction:column;gap:24px;
+  margin-top:16px;
+}
+.gen-item{
+  background:var(--bg-soft);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:18px;
+  transition:all 0.3s;
+}
+.gen-item:hover{border-color:var(--c-teal);box-shadow:var(--shadow-s)}
+.gen-title{
+  display:flex;align-items:center;gap:12px;
+  font-size:15px;font-weight:600;color:var(--c-blue);
+  margin-bottom:14px;
+}
+.gen-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:26px;border-radius:8px;
+  background:linear-gradient(135deg,var(--c-teal),var(--c-blue));
+  color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;
+}
+.gen-imgs{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.gen-img-box{
+  background:#fff;
+  border-radius:var(--r);
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.gen-img-box img{
+  width:100%;height:220px;object-fit:contain;display:block;
+  background:#fafafa;
+}
+.gen-img-box .caption{
+  font-size:11px;color:var(--ink-3);padding:8px 10px;text-align:center;
+  border-top:1px solid var(--line);background:var(--bg-card);
+}
+
 /* Test photos */
 .photos-grid{
   display:grid;
@@ -741,6 +783,24 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 }
 .footer p{font-size:12px;color:var(--ink-3)}
 
+/* TIMELINE / TEAM HISTORY */
+.timeline-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.tl-card{
+  background:var(--bg-card);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+  transition:all 0.3s;
+}
+.tl-card:hover{border-color:var(--c-teal);box-shadow:var(--shadow-s);transform:translateY(-2px)}
+.tl-card img{
+  width:100%;height:auto;object-fit:contain;display:block;
+}
+
 /* RESPONSIVE */
 /* ===== 平板/小屏 ≤768px ===== */
 @media(max-width:768px){
@@ -764,8 +824,10 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .future-grid,.photos-grid{grid-template-columns:1fr}
   .thermal-compare{grid-template-columns:1fr;gap:10px}
   .formula-strip{grid-template-columns:1fr}
-  .dm-images{grid-template-columns:1fr;gap:10px}
-  .dm-images .dm-img-box img{height:auto}
+  .dm-images{grid-template-columns:1fr!important;gap:12px}
+  .dm-images .dm-img-box img{height:auto;width:100%}
+  .feature-grid{grid-template-columns:1fr!important}
+  .timeline-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   /* 风速表滚动 */
   .wind-table{min-width:600px}
   .wind-table .wh,.wind-table .wd{padding:8px 6px;min-width:60px}
@@ -774,13 +836,19 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .gauge-wrap{width:160px;height:160px}
   .g-val{font-size:36px}
   /* 卡片 */
-  .data-card{padding:16px}
+  .data-card{padding:16px;overflow-x:hidden}
   .data-head{flex-direction:column;align-items:flex-start;gap:8px}
   .design-module{padding:14px}
   .pain-img-card .pic{height:110px}
   .slider-box{margin:0}
   /* 按钮 */
   .simu-btn-play,.simu-btn-stop{padding:10px 20px;font-size:13px}
+  /* 产品功能清单 */
+  .feature-grid > div{padding:20px}
+  /* 设计方案图片放大 */
+  .dm-images .dm-img-box img{min-height:260px}
+  /* 迭代过程平板端 */
+  .gen-imgs{grid-template-columns:1fr 1fr;gap:10px}
 }
 
 /* ===== 手机 ≤480px ===== */
@@ -789,7 +857,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .hero::before{height:190px}
   .hero-name{font-size:24px;letter-spacing:1px}
   .hero-desc{font-size:12px}
-  .main-card{padding:14px 12px;border-radius:14px}
+  .main-card{padding:14px 12px;border-radius:14px;overflow-x:hidden}
+  .wrap{padding:0 10px}
   .tab-btn{font-size:11px;padding:10px 2px}
   .tab-btn.active::after{width:20px}
   .metrics-strip{grid-template-columns:repeat(2,1fr)}
@@ -809,7 +878,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .simu-btn-play,.simu-btn-stop{width:100%;text-align:center}
   /* 图片卡片 */
   .pain-img-card .pic{height:90px}
-  .dm-images .dm-img-box img{height:auto}
+  .dm-images .dm-img-box img{height:auto;min-height:200px}
   /* 设计模块 */
   .design-module{padding:12px}
   .dm-header{gap:8px}
@@ -818,11 +887,24 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
   .section-title{font-size:17px}
   /* 图例单独行 */
   .data-head .legend{margin-top:4px}
+  /* 数据卡片防溢出 */
+  .data-card{overflow-x:hidden}
+  /* 产品功能清单 */
+  .feature-grid > div{padding:18px 16px}
+  /* 迭代过程 */
+  .gen-item{padding:14px}
+  .gen-imgs{grid-template-columns:1fr!important;gap:10px}
+  .gen-img-box img{height:auto;min-height:200px}
+  .gen-title{font-size:14px;gap:10px}
+  .timeline-grid{grid-template-columns:1fr!important;gap:10px}
+  /* 设计方案模块强制单列+大图 */
+  .dm-images{grid-template-columns:1fr!important}
+  .dm-images .dm-img-box img{height:auto;min-height:240px;width:100%}
+  .dm-img-box{min-height:240px}
 }
 
-/* REVEAL */
-.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
-.reveal.show{opacity:1;transform:translateY(0)}
+/* REVEAL — disabled for mobile performance */
+.reveal{opacity:1;transform:none;transition:none}
 
 /* ===== PAIN POINT IMAGES ===== */
 .pain-img-card{
@@ -871,6 +953,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .dm-header h4{font-size:15px;font-weight:600;color:var(--c-blue)}
 .dm-images{
   display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+.feature-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;
 }
 .dm-images .dm-img-box{
   background:var(--bg-soft);border-radius:var(--r);
@@ -1049,7 +1134,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <p style="margin-top:8px">刹车盘峰值温降超<strong style="color:var(--c-red)">200℃</strong>，高速零能耗运行，适用货车、乘用车与新能源汽车，实现节能、节水、节材、减排协同效益，助力交通运输绿色低碳转型。</p>
       </div>
       <div class="intro-img">
-        <img src="images/intro_infographic.jpg" alt="玄武速降设计思路" style="width:100%;border-radius:var(--r);border:1px solid var(--line)" onerror="this.style.display='none'">
+        <img src="images/intro_infographic.png" alt="玄武速降设计思路" style="width:100%;border-radius:var(--r);border:1px solid var(--line)" onerror="this.style.display='none'">
       </div>
     </div>
 
@@ -1093,11 +1178,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">1</div><h4>并联式智能风道模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module1_flow.jpg" alt="并联风道流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module1_flow.png" alt="并联风道流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">温度控制逻辑流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module1_model.jpg" alt="并联风道模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module1_model.png" alt="并联风道模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">并联风道三维模型</div>
           </div>
         </div>
@@ -1107,11 +1192,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">2</div><h4>文丘里涡流增压管道模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module2_flow.jpg" alt="文丘里涡流流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module2_flow.png" alt="文丘里涡流流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">文丘里增压流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module2_model.jpg" alt="文丘里涡流模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module2_model.png" alt="文丘里涡流模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">涡流增压三维模型</div>
           </div>
         </div>
@@ -1121,11 +1206,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">3</div><h4>环形风道控制系统模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module3_flow.jpg" alt="环形风道控制流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module3_flow.png" alt="环形风道控制流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">环形风道控制流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module3_model.jpg" alt="环形风道控制模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module3_model.png" alt="环形风道控制模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">齿轮传动系统模型</div>
           </div>
         </div>
@@ -1135,11 +1220,11 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="dm-header"><div class="dm-num">4</div><h4>高压精细雾化蒸发系统模块</h4></div>
         <div class="dm-images">
           <div class="dm-img-box">
-            <img src="images/module4_flow.jpg" alt="雾化蒸发流程图" onerror="this.parentElement.style.display='none'">
+            <img src="images/module4_flow.png" alt="雾化蒸发流程图" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">雾化蒸发系统流程图</div>
           </div>
           <div class="dm-img-box">
-            <img src="images/module4_model.jpg" alt="雾化蒸发模型" onerror="this.parentElement.style.display='none'">
+            <img src="images/module4_model.png" alt="雾化蒸发模型" onerror="this.parentElement.style.display='none'">
             <div class="dm-cap">泵阀喷嘴三维模型</div>
           </div>
         </div>
@@ -1197,9 +1282,24 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
         <div class="f-note">基于累计制动次数与温度加权</div>
       </div>
     </div>
-  </div>
 
-  <!-- ==================== TAB 2: AI智能分析 ==================== -->
+    <!-- 团队历程 -->
+    <div class="section-title" style="margin-top:36px;margin-bottom:20px">团队历程</div>
+    <div class="timeline-grid">
+      <div class="tl-card"><img src="images/timeline_01.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_02.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_03.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_04.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_05.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_06.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_07.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_08.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_09.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_10.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_11.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+      <div class="tl-card"><img src="images/timeline_12.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+    </div>
+  </div>
   <div class="tab-content" id="tab-ai">
     <div class="section-title">AI边缘计算 · 温控智能分析</div>
     <div class="section-subtitle">以下数据由AI芯片根据车体质量、历史制动数据与实时温度动态计算，随车辆工况变化实时更新，非预设固定值</div>
@@ -1339,7 +1439,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <!-- 产品功能清单 & 未来拓展 -->
     <div class="future-section">
       <div class="section-title">产品功能清单</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="feature-grid">
         <div style="background:linear-gradient(135deg,#f0faf7,#ffffff);border:1px solid #bbf7d0;border-radius:var(--r-lg);padding:24px;position:relative;overflow:hidden">
           <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--c-teal),var(--c-green))"></div>
           <h4 style="font-size:15px;font-weight:700;color:var(--c-teal);margin-bottom:16px;display:flex;align-items:center;gap:8px">
@@ -1415,7 +1515,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
     <div class="data-card">
       <div class="data-head">
         <div>
-          <h3>温降曲线对比（基于课题组前期台架实验数据）</h3>
+          <h3>温降曲线对比</h3>
           <p>工况：满载35t · 7%坡度 · 60km/h · 连续制动600s · 环境温度25°C</p>
         </div>
         <div class="legend">
@@ -1506,13 +1606,18 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <div class="data-head"><h3>仿真验证</h3></div>
       <!-- 文丘里风道速度场仿真视频 -->
       <div style="background:#0d1b2a;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px">
-        <video src="images/venturi_sim.mp4" style="width:100%;height:auto;max-height:500px;object-fit:contain;display:block" loop muted autoplay preload="auto" playsinline onerror="this.style.display='none'"></video>
+        <video id="simVideo" src="images/venturi_sim.mp4" style="width:100%;height:auto;max-height:500px;object-fit:contain;display:block" loop muted autoplay preload="auto" playsinline webkit-playsinline x5-playsinline onerror="this.style.display='none'">您的浏览器不支持视频播放</video>
       </div>
       <div style="font-size:12px;color:var(--ink-3);text-align:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--line)">文丘里风道速度场CFD仿真（ANSYS Fluent · k-&epsilon;湍流模型）</div>
 
       <!-- 流体动力学仿真动画 -->
       <div style="background:#0d1b2a;border-radius:var(--r);overflow:hidden;position:relative">
-        <canvas id="flowCanvas" style="width:100%;height:400px;display:block"></canvas>
+        <canvas id="flowCanvas" style="width:100%;display:block"></canvas>
+        <style>
+          #flowCanvas{height:400px}
+          @media(max-width:768px){#flowCanvas{height:300px!important}}
+          @media(max-width:480px){#flowCanvas{height:260px!important}}
+        </style>
       </div>
       <div style="display:flex;gap:8px;align-items:center;justify-content:center;padding:12px 0">
         <button class="simu-btn-play" onclick="toggleFlowAnim(true)" style="padding:8px 20px;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:var(--c-teal);color:#fff">▶ 播放动画</button>
@@ -1527,22 +1632,67 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
       <div style="font-size:12px;color:var(--ink-3);text-align:center;padding:8px">系统工作原理图</div>
     </div>
 
-    <!-- 实物测试 -->
+    <!-- 迭代过程 -->
     <div class="data-card">
-      <div class="data-head"><h3>初代实物测试</h3></div>
-      <div class="photos-grid">
-        <div class="photo-box">
-          <img src="images/p20_115.jpeg" alt="初代测试一" onerror="this.parentElement.style.display='none'">
-          <div class="caption">初代测试一</div>
+      <div class="data-head"><h3>迭代过程</h3></div>
+      <div class="gen-list">
+
+        <div class="gen-item">
+          <div class="gen-title"><span class="gen-num">01</span> 初代原型 · 原理验证</div>
+          <div class="gen-imgs">
+            <div class="gen-img-box">
+              <img src="images/gen1_1.png" alt="初代原型图1" onerror="this.parentElement.style.display='none'">
+              <div class="caption">初代原型 · 整体结构</div>
+            </div>
+            <div class="gen-img-box">
+              <img src="images/gen1_2.png" alt="初代原型图2" onerror="this.parentElement.style.display='none'">
+              <div class="caption">初代原型 · 风道模块</div>
+            </div>
+          </div>
         </div>
-        <div class="photo-box">
-          <img src="images/p20_116.jpeg" alt="初代测试二" onerror="this.parentElement.style.display='none'">
-          <div class="caption">初代测试二</div>
+
+        <div class="gen-item">
+          <div class="gen-title"><span class="gen-num">02</span> 二代优化 · 结构升级</div>
+          <div class="gen-imgs">
+            <div class="gen-img-box">
+              <img src="images/gen2_1.jpg" alt="二代优化图1" onerror="this.parentElement.style.display='none'">
+              <div class="caption">二代 · 文丘里风道改进</div>
+            </div>
+            <div class="gen-img-box">
+              <img src="images/gen2_2.jpg" alt="二代优化图2" onerror="this.parentElement.style.display='none'">
+              <div class="caption">二代 · 雾化系统集成</div>
+            </div>
+          </div>
         </div>
-        <div class="photo-box">
-          <img src="images/p20_117.jpeg" alt="初代测试三" onerror="this.parentElement.style.display='none'">
-          <div class="caption">初代测试三</div>
+
+        <div class="gen-item">
+          <div class="gen-title"><span class="gen-num">03</span> 三代改进 · 性能强化</div>
+          <div class="gen-imgs">
+            <div class="gen-img-box">
+              <img src="images/gen3_1.png" alt="三代改进图1" onerror="this.parentElement.style.display='none'">
+              <div class="caption">三代 · 环形风道系统</div>
+            </div>
+            <div class="gen-img-box">
+              <img src="images/gen3_2.png" alt="三代改进图2" onerror="this.parentElement.style.display='none'">
+              <div class="caption">三代 · 整体结构模型</div>
+            </div>
+          </div>
         </div>
+
+        <div class="gen-item">
+          <div class="gen-title"><span class="gen-num">04</span> 四代成品 · 工程化落地</div>
+          <div class="gen-imgs">
+            <div class="gen-img-box">
+              <img src="images/gen4_1.jpg" alt="四代成品图1" onerror="this.parentElement.style.display='none'">
+              <div class="caption">四代成品 · 整体装配</div>
+            </div>
+            <div class="gen-img-box">
+              <img src="images/gen4_2.jpg" alt="四代成品图2" onerror="this.parentElement.style.display='none'">
+              <div class="caption">四代成品 · 细节展示</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1937,9 +2087,10 @@ function runFlowAnim(){
 
   const venturiY = H*0.5;
   const throatX = W*0.5;  // 居中，使左右渐变距离相等
-  const inletW = H*0.35;
-  const throatW = H*0.08;
-  const outletW = H*0.35; // 与入口端对称
+  // 管道尺寸基于高度计算，保持固定宽高比，不随屏幕宽度变形
+  const inletW = H*0.55;
+  const throatW = H*0.12;
+  const outletW = H*0.55; // 与入口端对称
 
   function getWidthAt(x){
     if(x<throatX) return inletW - (inletW-throatW)*(x/throatX);
@@ -1949,7 +2100,8 @@ function runFlowAnim(){
     if(x<throatX) return 1.2 + 8.5*Math.pow(x/throatX, 0.85);
     else {
       const ratio = (x-throatX)/(W-throatX);
-      return 10 - 5*Math.pow(ratio, 0.7);
+      // 出口段速度快速衰减，防止粒子提前扩散
+      return 9.7 * Math.pow(1 - ratio, 1.5) + 1.2;
     }
   }
 
@@ -2055,6 +2207,36 @@ const obs = new IntersectionObserver(es=>{
   es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')});
 },{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ===== VIDEO AUTOPLAY FIX =====
+(function(){
+  const simVideo = document.getElementById('simVideo');
+  if(!simVideo) return;
+  simVideo.muted = true;
+  simVideo.playsInline = true;
+  // 多次尝试自动播放
+  function tryPlay(){
+    simVideo.play().catch(()=>{});
+  }
+  tryPlay();
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)tryPlay()});
+  document.addEventListener('touchstart',tryPlay,{once:true});
+  simVideo.addEventListener('click',tryPlay);
+  // 检测是否真的在播放，没播放就显示提示
+  setTimeout(function(){
+    if(simVideo.paused){
+      simVideo.poster = '';
+      simVideo.style.opacity = '0.3';
+      const hint = document.createElement('div');
+      hint.id = 'video-hint';
+      hint.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(42,157,143,0.9);color:#fff;padding:14px 28px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;z-index:10;font-family:Noto Sans SC,sans-serif';
+      hint.textContent = '点击播放视频';
+      hint.onclick = function(){simVideo.play().then(()=>{simVideo.style.opacity='1';hint.remove()}).catch(()=>{})};
+      simVideo.parentElement.style.position = 'relative';
+      simVideo.parentElement.appendChild(hint);
+    }
+  },2000);
+})();
 </script>
 </body>
 </html>
